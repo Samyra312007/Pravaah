@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { DashboardKPI, TrendDataPoint, DistrictComparison, CategoryBreakdown, Hotspot, RiskScore } from "@/types/analytics";
+import type { DashboardKPI, TrendDataPoint, DistrictComparison, CategoryBreakdown, Hotspot, RiskScore, AnomalyData, SocioEconomicCorrelation } from "@/types/analytics";
 import {
   mockKpis,
   generateMockTrends,
@@ -9,6 +9,8 @@ import {
   generateMockCategoryBreakdown,
   generateMockHotspots,
   generateMockRiskScores,
+  generateMockAnomalies,
+  generateMockSocioEconomic,
 } from "@/lib/mock/mockData";
 
 function delay(ms = 400): Promise<void> {
@@ -79,6 +81,28 @@ export function useRiskScores() {
   }, []);
 
   return { scores, loading };
+}
+
+export function useAnomalies() {
+  const [anomalies, setAnomalies] = useState<AnomalyData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    delay(500).then(() => { setAnomalies(generateMockAnomalies()); setLoading(false); });
+  }, []);
+
+  return { anomalies, loading };
+}
+
+export function useSocioEconomic() {
+  const [data, setData] = useState<SocioEconomicCorrelation | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    delay(500).then(() => { setData(generateMockSocioEconomic()); setLoading(false); });
+  }, []);
+
+  return { data, loading };
 }
 
 export function useTrendAlerts() {

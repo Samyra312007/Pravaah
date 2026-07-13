@@ -1,11 +1,11 @@
 "use client";
 
-import { FolderSearch, FileSearch, TrendingUp, AlertTriangle, Scale, Users, Gavel } from "lucide-react";
+import { FolderSearch, FileSearch, TrendingUp, AlertTriangle, Scale, Users, Gavel, Brain } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
-import { KpiCard, TrendChart, CategoryBreakdownChart, DistrictComparisonChart } from "@/components/charts";
+import { KpiCard, TrendChart, CategoryBreakdownChart, DistrictComparisonChart, RiskScoreMap, AnomalyCards, SocioEconomicChart } from "@/components/charts";
 import { TrendAlertBadge } from "@/components/alerts/TrendAlertBadge";
 import { TrendAlertIndicator } from "@/components/alerts/TrendAlertIndicator";
-import { useDashboard, useTrends, useDistrictComparison, useCategoryBreakdown, useTrendAlerts } from "@/hooks/useMockAnalytics";
+import { useDashboard, useTrends, useDistrictComparison, useCategoryBreakdown, useTrendAlerts, useRiskScores, useAnomalies, useSocioEconomic } from "@/hooks/useMockAnalytics";
 import type { Role } from "@/types/common";
 
 const allRoles: Role[] = ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR", "ANALYST"];
@@ -16,6 +16,9 @@ export default function DashboardPage() {
   const { comparison, loading: comparisonLoading } = useDistrictComparison();
   const { data: categoryData, loading: categoryLoading } = useCategoryBreakdown();
   const { alerts, loading: alertsLoading } = useTrendAlerts();
+  const { scores, loading: scoresLoading } = useRiskScores();
+  const { anomalies, loading: anomaliesLoading } = useAnomalies();
+  const { data: socioEconomic, loading: socioLoading } = useSocioEconomic();
 
   return (
     <RoleGuard roles={allRoles}>
@@ -124,6 +127,46 @@ export default function DashboardPage() {
           ) : (
             <DistrictComparisonChart data={comparison} />
           )}
+        </div>
+
+        {/* Phase 5: ML Intelligence Section */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Brain className="h-5 w-5 text-ksp-blue" />
+            <h2 className="text-lg font-semibold text-gray-800">ML Intelligence</h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            {/* Risk Score Choropleth Map */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800">District Risk Scores</h3>
+                <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Random Forest Model</span>
+              </div>
+              <RiskScoreMap scores={scores} loading={scoresLoading} />
+            </div>
+
+            {/* Anomaly Detection Call-Outs */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800">Anomaly Flags</h3>
+                <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Isolation Forest Model</span>
+              </div>
+              <AnomalyCards anomalies={anomalies} loading={anomaliesLoading} />
+            </div>
+          </div>
+
+          {/* Socio-Economic Correlation */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-800">Socio-Economic vs Crime Correlation</h3>
+              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">Pearson Correlation</span>
+            </div>
+            <SocioEconomicChart
+              details={socioEconomic?.details ?? []}
+              loading={socioLoading}
+            />
+          </div>
         </div>
       </div>
     </RoleGuard>

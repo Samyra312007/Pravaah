@@ -1,4 +1,4 @@
-import type { DashboardKPI, TrendDataPoint, DistrictComparison, CategoryBreakdown, Hotspot, RiskScore } from "@/types/analytics";
+import type { DashboardKPI, TrendDataPoint, DistrictComparison, CategoryBreakdown, Hotspot, RiskScore, AnomalyData, SocioEconomicCorrelation } from "@/types/analytics";
 
 export const districts = [
   "Bengaluru Urban", "Bengaluru Rural", "Mysuru", "Hubballi-Dharwad", "Belagavi",
@@ -131,6 +131,43 @@ export interface DrillDownData {
     totalCases: number;
     activeCases: number;
   }>;
+}
+
+export function generateMockAnomalies(): AnomalyData[] {
+  const anomalies: AnomalyData[] = [];
+  const districts = ["Bengaluru Urban", "Mysuru", "Hubballi-Dharwad", "Belagavi", "Kalaburagi", "Mangaluru"];
+  const crimeHeads = ["Cyber Crimes", "Crimes Against Women", "Crimes Against Body", "Narcotics", "Economic Offences"];
+  const count = Math.floor(Math.random() * 4) + 3;
+  for (let i = 0; i < count; i++) {
+    const isAnom = Math.random() > 0.4;
+    anomalies.push({
+      caseId: 10000 + Math.floor(Math.random() * 90000),
+      district: districts[Math.floor(Math.random() * districts.length)],
+      crimeHead: crimeHeads[Math.floor(Math.random() * crimeHeads.length)],
+      anomalyScore: isAnom ? 0.6 + Math.random() * 0.4 : Math.random() * 0.3,
+      isAnomaly: isAnom,
+      registeredDate: `2026-${String(Math.floor(Math.random() * 6) + 1).padStart(2, "0")}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, "0")}`,
+      description: isAnom
+        ? "Unusual pattern: case characteristics deviate significantly from historical norms"
+        : "Normal pattern: case falls within expected parameters",
+    });
+  }
+  return anomalies;
+}
+
+export function generateMockSocioEconomic(): SocioEconomicCorrelation {
+  return {
+    correlationCoefficient: 0.42,
+    pValue: 0.003,
+    significantVariables: ["unemployment_rate", "literacy_rate", "urbanization_index"],
+    details: [
+      { indicator: "unemployment_rate", coefficient: 0.68, pValue: 0.001, significant: true },
+      { indicator: "literacy_rate", coefficient: -0.54, pValue: 0.002, significant: true },
+      { indicator: "poverty_index", coefficient: 0.31, pValue: 0.078, significant: false },
+      { indicator: "urbanization_index", coefficient: 0.47, pValue: 0.015, significant: true },
+      { indicator: "police_per_capita", coefficient: -0.22, pValue: 0.210, significant: false },
+    ],
+  };
 }
 
 export function generateMockDistrictDrillDown(districtName: string): DrillDownData {
