@@ -16,8 +16,6 @@ pipeline:
           directory: catalyst/client
         - run: npm run build
           directory: catalyst/client
-        - run: npm run export
-          directory: catalyst/client
         - run: pip install -r requirements.txt
           directory: catalyst/appsail/ml-service
 

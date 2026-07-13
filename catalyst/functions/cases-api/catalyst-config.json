@@ -22,6 +22,17 @@
       { "path": "/cases/{id}/chargesheet", "method": "POST", "function": "chargesheet" },
       { "path": "/cases/{id}/arrests", "method": "GET", "function": "arrests" },
       { "path": "/cases/{id}/arrests", "method": "POST", "function": "arrests" }
-    ]
+    ],
+    "throttling": {
+      "enabled": true,
+      "rate": {
+        "window_ms": 60000,
+        "max_requests": 100
+      }
+    },
+    "authentication": {
+      "enabled": true,
+      "roles": ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR", "ANALYST"]
+    }
   }
 }

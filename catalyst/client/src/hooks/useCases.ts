@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/lib/catalyst";
-import type { CaseListItem, CaseDetail } from "@/types/case";
+import type { CaseListItem, CaseDetail, CaseMaster } from "@/types/case";
 import type { ApiResponse } from "@/types/common";
 
 export function useCases(params?: Record<string, string | number>) {
@@ -20,7 +20,8 @@ export function useCases(params?: Record<string, string | number>) {
           return acc;
         }, {} as Record<string, string>)
       ).toString() : "";
-      const res = await api.get<ApiResponse<CaseListItem[]>>(`/cases${qs}`);
+      const endpoint = params?.q ? `/cases/search${qs}` : `/cases${qs}`;
+      const res = await api.get<ApiResponse<CaseListItem[]>>(endpoint);
       if (res.status === "success" && res.data) {
         setCases(res.data);
         setTotal(res.meta?.total || 0);
@@ -42,22 +43,21 @@ export function useCaseDetail(id: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetch() {
-      setLoading(true);
-      try {
-        const res = await api.get<ApiResponse<CaseDetail>>(`/cases/${id}`);
-        if (res.status === "success" && res.data) setCaseDetail(res.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch case");
-      } finally {
-        setLoading(false);
-      }
+  const fetchDetail = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get<ApiResponse<CaseDetail>>(`/cases/${id}`);
+      if (res.status === "success" && res.data) setCaseDetail(res.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch case");
+    } finally {
+      setLoading(false);
     }
-    fetch();
   }, [id]);
 
-  return { caseDetail, loading, error };
+  useEffect(() => { fetchDetail(); }, [fetchDetail]);
+
+  return { caseDetail, loading, error, refetch: fetchDetail };
 }
 
 export function useCreateCase() {
@@ -80,4 +80,44 @@ export function useCreateCase() {
   };
 
   return { createCase, loading, error };
+}
+
+export function useCaseUpdate() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updateCase = async (id: string, data: Partial<CaseMaster>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.put<ApiResponse<CaseMaster>>(`/cases/${id}`, data);
+      if (res.status !== "success") throw new Error("Failed to update case");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update case");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { updateCase, loading, error };
+}
+
+export function useDeleteCase() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const deleteCase = async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await api.delete<ApiResponse<{ message: string }>>(`/cases/${id}`);
+      if (res.status !== "success") throw new Error("Failed to delete case");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete case");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { deleteCase, loading, error };
 }

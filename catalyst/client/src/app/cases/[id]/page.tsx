@@ -1,39 +1,125 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Calendar, User, Scale, FileText } from "lucide-react";
+import {
+  ArrowLeft, MapPin, Calendar, User, Scale, FileText,
+  Pencil, Trash2, Plus, X, Check,
+} from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
-import { useCaseDetail } from "@/hooks/useCases";
+import { api } from "@/lib/catalyst";
+import { useCaseDetail, useCaseUpdate, useDeleteCase } from "@/hooks/useCases";
 import { formatDate } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import type { Role } from "@/types/common";
+import type { CaseMaster, Victim, Accused, Complainant, ActSectionAssociation, ArrestSurrender } from "@/types/case";
 
 const caseRoles: Role[] = ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR"];
 
-function DetailCard({ title, children }: { title: string; children: React.ReactNode }) {
+function DetailCard({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="card">
-      <div className="px-5 py-3 border-b border-gray-100">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
         <h3 className="font-semibold text-gray-800">{title}</h3>
+        {action}
       </div>
       <div className="p-5">{children}</div>
     </div>
   );
 }
 
-function Field({ label, value }: { label: string; value?: string | number | null }) {
-  return (
-    <div className="flex items-start gap-2">
-      <span className="text-xs font-medium text-gray-400 w-36 shrink-0 pt-0.5">{label}</span>
-      <span className="text-sm text-gray-800">{value ?? "—"}</span>
-    </div>
-  );
-}
-
 export default function CaseDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const caseId = params.id as string;
-  const { caseDetail, loading, error } = useCaseDetail(caseId);
+  const { caseDetail, loading, error, refetch } = useCaseDetail(caseId);
+  const updateCase = useCaseUpdate();
+  const deleteCase = useDeleteCase();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<CaseMaster>>({});
+  const [deleting, setDeleting] = useState(false);
+
+  // Sub-entity add forms
+  const [newVictim, setNewVictim] = useState({ VictimName: "", AgeYear: "", GenderID: "" });
+  const [newAccused, setNewAccused] = useState({ AccusedName: "", AgeYear: "", GenderID: "" });
+  const [newComplainant, setNewComplainant] = useState({ ComplainantName: "", AgeYear: "" });
+  const [newSection, setNewSection] = useState({ ActID: "", SectionID: "" });
+  const [addingTo, setAddingTo] = useState<string | null>(null);
+
+  const handleEdit = () => {
+    if (caseDetail) {
+      setEditForm({ ...caseDetail.master });
+      setIsEditing(true);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    await updateCase.updateCase(caseId, editForm);
+    setIsEditing(false);
+    refetch();
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to close this case?")) return;
+    setDeleting(true);
+    await deleteCase.deleteCase(caseId);
+    setDeleting(false);
+    router.push("/cases");
+  };
+
+  const handleAddVictim = async () => {
+    if (!newVictim.VictimName) return;
+    await api.post(`/cases/${caseId}/victims`, {
+      VictimName: newVictim.VictimName,
+      AgeYear: newVictim.AgeYear ? parseInt(newVictim.AgeYear) : undefined,
+      GenderID: newVictim.GenderID ? parseInt(newVictim.GenderID) : undefined,
+    });
+    setNewVictim({ VictimName: "", AgeYear: "", GenderID: "" });
+    setAddingTo(null);
+    refetch();
+  };
+
+  const handleAddAccused = async () => {
+    if (!newAccused.AccusedName) return;
+    await api.post(`/cases/${caseId}/accused`, {
+      AccusedName: newAccused.AccusedName,
+      AgeYear: newAccused.AgeYear ? parseInt(newAccused.AgeYear) : undefined,
+      GenderID: newAccused.GenderID ? parseInt(newAccused.GenderID) : undefined,
+    });
+    setNewAccused({ AccusedName: "", AgeYear: "", GenderID: "" });
+    setAddingTo(null);
+    refetch();
+  };
+
+  const handleAddComplainant = async () => {
+    if (!newComplainant.ComplainantName) return;
+    await api.post(`/cases/${caseId}/complainants`, {
+      ComplainantName: newComplainant.ComplainantName,
+      AgeYear: newComplainant.AgeYear ? parseInt(newComplainant.AgeYear) : undefined,
+    });
+    setNewComplainant({ ComplainantName: "", AgeYear: "" });
+    setAddingTo(null);
+    refetch();
+  };
+
+  const handleAddSection = async () => {
+    if (!newSection.ActID || !newSection.SectionID) return;
+    await api.post(`/cases/${caseId}/act-sections`, {
+      ActID: parseInt(newSection.ActID),
+      SectionID: newSection.SectionID,
+    });
+    setNewSection({ ActID: "", SectionID: "" });
+    setAddingTo(null);
+    refetch();
+  };
+
+  const handleRemoveSection = async (actId: number, sectionId: string) => {
+    await api.post(`/cases/${caseId}/act-sections`, {
+      _action: "remove", ActID: actId, SectionID: sectionId,
+    });
+    refetch();
+  };
 
   if (loading) {
     return (
@@ -59,6 +145,35 @@ export default function CaseDetailPage() {
   const { master, victims, accused, complainants, actSections, arrests, chargesheet, references } = caseDetail;
   const refs = references || {};
 
+  const statusColors: Record<string, string> = {
+    "Under Investigation": "warning", "Chargesheet Filed": "info",
+    "Trial in Progress": "primary", Convicted: "danger",
+    Acquitted: "success", Closed: "default",
+  };
+
+  const AddForm = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div className="mt-3 pt-3 border-t border-gray-100">
+      {addingTo === label ? (
+        <div className="space-y-2">
+          {children}
+          <div className="flex gap-2">
+            <button onClick={() => {
+              if (label === "Victim") handleAddVictim();
+              else if (label === "Accused") handleAddAccused();
+              else if (label === "Complainant") handleAddComplainant();
+              else if (label === "Section") handleAddSection();
+            }} className="flex items-center gap-1 text-xs bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700"><Check className="h-3 w-3" /> Add</button>
+            <button onClick={() => setAddingTo(null)} className="flex items-center gap-1 text-xs text-gray-500 px-3 py-1.5 rounded-lg hover:bg-gray-100"><X className="h-3 w-3" /> Cancel</button>
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => setAddingTo(label)} className="flex items-center gap-1 text-xs text-ksp-blue font-medium hover:underline">
+          <Plus className="h-3 w-3" /> Add {label}
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <RoleGuard roles={caseRoles}>
       <div className="space-y-6">
@@ -67,32 +182,64 @@ export default function CaseDetailPage() {
           <Link href="/cases" className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900">
-              Case {master.CrimeNo || `#${master.CaseMasterID}`}
-            </h2>
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Case {master.CrimeNo || `#${master.CaseMasterID}`}
+              </h2>
+              <Badge variant={(statusColors[refs.status?.CaseStatusName || ""] || "default") as any}>
+                {refs.status?.CaseStatusName || "—"}
+              </Badge>
+              <Badge variant={refs.gravity?.LookupValue === "Heinous" ? "danger" : "default"}>
+                {refs.gravity?.LookupValue || "—"}
+              </Badge>
+            </div>
             <p className="text-sm text-gray-400">{master.CaseNo ? `Case No: ${master.CaseNo}` : ""}</p>
           </div>
-          <div className="ml-auto flex gap-2">
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              refs.status?.CaseStatusName === "Under Investigation" ? "bg-yellow-100 text-yellow-700" :
-              refs.status?.CaseStatusName === "Chargesheet Filed" ? "bg-blue-100 text-blue-700" :
-              "bg-gray-100 text-gray-600"
-            }`}>
-              {refs.status?.CaseStatusName || "—"}
-            </span>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              refs.gravity?.LookupValue === "Heinous" ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-500"
-            }`}>
-              {refs.gravity?.LookupValue || "—"}
-            </span>
+          <div className="flex gap-2">
+            <button onClick={handleEdit} className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+              <Pencil className="h-4 w-4" /> Edit
+            </button>
+            <button onClick={handleDelete} disabled={deleting} className="flex items-center gap-2 px-3 py-2 border border-red-200 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50">
+              <Trash2 className="h-4 w-4" /> {deleting ? "Closing..." : "Close"}
+            </button>
           </div>
         </div>
+
+        {/* Inline Edit Mode */}
+        {isEditing && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+            <h3 className="font-semibold text-blue-800 mb-3">Editing Case Details</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { label: "Crime No", field: "CrimeNo" },
+                { label: "Case No", field: "CaseNo" },
+                { label: "Registered Date", field: "CrimeRegisteredDate", type: "date" },
+                { label: "Brief Facts", field: "BriefFacts", span: true },
+              ].map(({ label, field, type, span }) => (
+                <div key={field} className={span ? "col-span-2" : ""}>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
+                  {span ? (
+                    <textarea value={(editForm as any)[field] || ""} onChange={(e) => setEditForm({ ...editForm, [field]: e.target.value })} className="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm" rows={2} />
+                  ) : (
+                    <input type={type || "text"} value={(editForm as any)[field] || ""} onChange={(e) => setEditForm({ ...editForm, [field]: e.target.value })} className="w-full px-3 py-2 border border-blue-200 rounded-lg text-sm" />
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button onClick={handleSaveEdit} disabled={updateCase.loading} className="flex items-center gap-2 px-4 py-2 bg-ksp-blue text-white rounded-lg text-sm font-medium hover:bg-ksp-navy">
+                <Check className="h-4 w-4" /> {updateCase.loading ? "Saving..." : "Save Changes"}
+              </button>
+              <button onClick={() => setIsEditing(false)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Cancel</button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Case Details */}
+            {/* Case Information */}
             <DetailCard title="Case Information">
               <div className="grid grid-cols-2 gap-y-3">
                 <div className="flex items-center gap-2 text-sm">
@@ -129,11 +276,6 @@ export default function CaseDetailPage() {
                   <span className="font-medium">{refs.category?.LookupValue || "—"}</span>
                 </div>
               </div>
-              {master.latitude && master.longitude && (
-                <div className="mt-3 pt-3 border-t border-gray-100">
-                  <Field label="Coordinates" value={`${master.latitude}, ${master.longitude}`} />
-                </div>
-              )}
               {master.BriefFacts && (
                 <div className="mt-3 pt-3 border-t border-gray-100">
                   <span className="text-xs font-medium text-gray-400 block mb-1">Brief Facts</span>
@@ -164,6 +306,10 @@ export default function CaseDetailPage() {
                   </tbody>
                 </table>
               )}
+              <AddForm label="Complainant">
+                <input value={newComplainant.ComplainantName} onChange={(e) => setNewComplainant({ ...newComplainant, ComplainantName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Name" />
+                <input value={newComplainant.AgeYear} onChange={(e) => setNewComplainant({ ...newComplainant, AgeYear: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Age" type="number" />
+              </AddForm>
             </DetailCard>
 
             {/* Victims */}
@@ -177,7 +323,6 @@ export default function CaseDetailPage() {
                       <th className="pb-2 font-medium">Name</th>
                       <th className="pb-2 font-medium">Age</th>
                       <th className="pb-2 font-medium">Gender</th>
-                      <th className="pb-2 font-medium">Police</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -186,20 +331,30 @@ export default function CaseDetailPage() {
                         <td className="py-2 text-gray-800">{v.VictimName}</td>
                         <td className="py-2 text-gray-500">{v.AgeYear || "—"}</td>
                         <td className="py-2 text-gray-500">{v.GenderID === 1 ? "Male" : v.GenderID === 2 ? "Female" : "—"}</td>
-                        <td className="py-2 text-gray-500">{v.VictimPolice || "—"}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               )}
+              <AddForm label="Victim">
+                <input value={newVictim.VictimName} onChange={(e) => setNewVictim({ ...newVictim, VictimName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Name" />
+                <div className="flex gap-2">
+                  <input value={newVictim.AgeYear} onChange={(e) => setNewVictim({ ...newVictim, AgeYear: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Age" type="number" />
+                  <select value={newVictim.GenderID} onChange={(e) => setNewVictim({ ...newVictim, GenderID: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                    <option value="">Gender</option>
+                    <option value="1">Male</option>
+                    <option value="2">Female</option>
+                  </select>
+                </div>
+              </AddForm>
             </DetailCard>
 
             {/* Chargesheet */}
             {chargesheet && (
               <DetailCard title="Chargesheet">
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="CS Date" value={chargesheet.csdate ? formatDate(chargesheet.csdate) : null} />
-                  <Field label="CS Type" value={chargesheet.cstype} />
+                  <div className="text-sm"><span className="text-gray-400">Date:</span> <span className="font-medium">{chargesheet.csdate ? formatDate(chargesheet.csdate) : "—"}</span></div>
+                  <div className="text-sm"><span className="text-gray-400">Type:</span> <span className="font-medium">{chargesheet.cstype || "—"}</span></div>
                 </div>
               </DetailCard>
             )}
@@ -226,6 +381,17 @@ export default function CaseDetailPage() {
                   ))}
                 </div>
               )}
+              <AddForm label="Accused">
+                <input value={newAccused.AccusedName} onChange={(e) => setNewAccused({ ...newAccused, AccusedName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Name" />
+                <div className="flex gap-2">
+                  <input value={newAccused.AgeYear} onChange={(e) => setNewAccused({ ...newAccused, AgeYear: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Age" type="number" />
+                  <select value={newAccused.GenderID} onChange={(e) => setNewAccused({ ...newAccused, GenderID: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                    <option value="">Gender</option>
+                    <option value="1">Male</option>
+                    <option value="2">Female</option>
+                  </select>
+                </div>
+              </AddForm>
             </DetailCard>
 
             {/* Act-Sections */}
@@ -235,20 +401,39 @@ export default function CaseDetailPage() {
               ) : (
                 <div className="space-y-2">
                   {actSections.map((as, i) => (
-                    <div key={i} className="flex items-start gap-2 text-sm">
-                      <Scale className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
-                      <div>
-                        <span className="font-medium text-gray-800">
-                          {(as as any).ShortName || `Act ${as.ActID}`} § {as.SectionID}
-                        </span>
-                        {(as as any).SectionDescription && (
-                          <p className="text-xs text-gray-400">{(as as any).SectionDescription}</p>
-                        )}
+                    <div key={i} className="flex items-center justify-between gap-2 text-sm p-2 hover:bg-gray-50 rounded-lg group">
+                      <div className="flex items-start gap-2">
+                        <Scale className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                        <div>
+                          <span className="font-medium text-gray-800">
+                            {(as as any).ShortName || `Act ${as.ActID}`} § {as.SectionID}
+                          </span>
+                          {(as as any).SectionDescription && (
+                            <p className="text-xs text-gray-400">{(as as any).SectionDescription}</p>
+                          )}
+                        </div>
                       </div>
+                      <button onClick={() => handleRemoveSection(as.ActID, as.SectionID)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <X className="h-3 w-3" />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
+              <AddForm label="Section">
+                <div className="flex gap-2">
+                  <select value={newSection.ActID} onChange={(e) => setNewSection({ ...newSection, ActID: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                    <option value="">Act</option>
+                    <option value="1">IPC</option>
+                    <option value="2">CrPC</option>
+                    <option value="3">NDPS</option>
+                    <option value="4">IT Act</option>
+                    <option value="5">Arms Act</option>
+                    <option value="6">POCSO</option>
+                  </select>
+                  <input value={newSection.SectionID} onChange={(e) => setNewSection({ ...newSection, SectionID: e.target.value })} className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Section (e.g. 302)" />
+                </div>
+              </AddForm>
             </DetailCard>
 
             {/* Arrests */}

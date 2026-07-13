@@ -11,7 +11,7 @@
         "domain": "ksp-crime.karnataka.gov.in",
         "services": {
           "slate": {
-            "build_command": "npm run build && npm run export",
+            "build_command": "npm run build",
             "output_dir": "client/out"
           },
           "functions": {

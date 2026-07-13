@@ -1,0 +1,36 @@
+node_modules/
+.next/
+out/
+dist/
+.catalyst/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+venv/
+.venv/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Build artifacts
+catalyst/appsail/ml-service/trained_models/*.pkl

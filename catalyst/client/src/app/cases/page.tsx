@@ -1,25 +1,24 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Plus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  ArrowUpDown, ArrowUp, ArrowDown, Search, Eye,
+  ArrowUpDown, ArrowUp, ArrowDown, Search, Eye, RefreshCw,
 } from "lucide-react";
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
-  getPaginationRowModel,
   flexRender,
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
 import { RoleGuard } from "@/components/layout/RoleGuard";
-import { useCases } from "@/hooks/useCases";
+import { api } from "@/lib/catalyst";
 import { formatDate } from "@/lib/utils";
-import type { CaseListItem } from "@/types/case";
-import type { Role } from "@/types/common";
+import type { CaseListItem, CaseDetail } from "@/types/case";
+import type { Role, ApiResponse } from "@/types/common";
 
 const caseMgmtRoles: Role[] = ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR"];
 
@@ -32,18 +31,78 @@ export default function CasesPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([{ id: "CrimeRegisteredDate", desc: true }]);
   const [pageIndex, setPageIndex] = useState(0);
+  const [cases, setCases] = useState<CaseListItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [districts, setDistricts] = useState<{ id: number; name: string }[]>([]);
+  const [crimeHeads, setCrimeHeads] = useState<{ id: number; name: string }[]>([]);
+  const [statuses, setStatuses] = useState<{ id: number; name: string }[]>([]);
   const pageSize = 25;
 
-  const params = useMemo(() => {
-    const p: Record<string, string | number> = { page: pageIndex + 1, perPage: pageSize };
-    if (searchQuery) p.searchQuery = searchQuery;
-    if (districtFilter) p.districtId = districtFilter;
-    if (crimeFilter) p.crimeHeadId = crimeFilter;
-    if (statusFilter) p.statusId = statusFilter;
-    return p;
-  }, [pageIndex, searchQuery, districtFilter, crimeFilter, statusFilter]);
+  // Fetch lookup data on mount
+  useEffect(() => {
+    async function fetchLookups() {
+      try {
+        const [dRes, cRes, sRes] = await Promise.allSettled([
+          api.get<ApiResponse<{ DistrictID: number; DistrictName: string }[]>>("/lookups/districts"),
+          api.get<ApiResponse<{ CrimeHeadID: number; CrimeGroupName: string }[]>>("/lookups/crime-heads"),
+          api.get<ApiResponse<{ CaseStatusID: number; CaseStatusName: string }[]>>("/lookups/case-statuses"),
+        ]);
 
-  const { cases, total, loading } = useCases(params);
+        if (dRes.status === "fulfilled" && dRes.value.data) {
+          setDistricts(dRes.value.data.map((d: any) => ({ id: d.DistrictID, name: d.DistrictName })));
+        }
+        if (cRes.status === "fulfilled" && cRes.value.data) {
+          setCrimeHeads(cRes.value.data.map((c: any) => ({ id: c.CrimeHeadID, name: c.CrimeGroupName })));
+        }
+        if (sRes.status === "fulfilled" && sRes.value.data) {
+          setStatuses(sRes.value.data.map((s: any) => ({ id: s.CaseStatusID, name: s.CaseStatusName })));
+        }
+      } catch {
+        // If lookup APIs fail, use hardcoded fallbacks
+        setDistricts([
+          { id: 1, name: "Bengaluru Urban" }, { id: 3, name: "Mysuru" },
+          { id: 4, name: "Hubballi-Dharwad" }, { id: 5, name: "Belagavi" }, { id: 6, name: "Ballari" },
+        ]);
+        setCrimeHeads([
+          { id: 1, name: "Murder" }, { id: 2, name: "Robbery" }, { id: 3, name: "Burglary" },
+          { id: 4, name: "Assault" }, { id: 5, name: "Fraud" }, { id: 7, name: "Cyber Crime" },
+        ]);
+        setStatuses([
+          { id: 1, name: "Under Investigation" }, { id: 2, name: "Chargesheet Filed" },
+          { id: 3, name: "Trial in Progress" }, { id: 4, name: "Convicted" },
+          { id: 5, name: "Acquitted" }, { id: 6, name: "Closed" },
+        ]);
+      }
+    }
+    fetchLookups();
+  }, []);
+
+  // Fetch cases with search query - use dedicated search endpoint when query is present
+  useEffect(() => {
+    async function fetchCases() {
+      setLoading(true);
+      try {
+        const qs = new URLSearchParams({ page: String(pageIndex + 1), perPage: String(pageSize) });
+        if (searchQuery) qs.set("q", searchQuery);
+        if (districtFilter) qs.set("districtId", districtFilter);
+        if (crimeFilter) qs.set("crimeHeadId", crimeFilter);
+        if (statusFilter) qs.set("statusId", statusFilter);
+
+        const endpoint = searchQuery ? `/cases/search?${qs}` : `/cases?${qs}`;
+        const res = await api.get<ApiResponse<CaseListItem[]>>(endpoint);
+        if (res.status === "success" && res.data) {
+          setCases(res.data);
+          setTotal(res.meta?.total || 0);
+        }
+      } catch (err) {
+        console.error("Failed to fetch cases", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCases();
+  }, [pageIndex, searchQuery, districtFilter, crimeFilter, statusFilter]);
 
   const columns = useMemo(() => [
     columnHelper.accessor("CrimeNo", {
@@ -108,15 +167,8 @@ export default function CasesPage() {
     columns,
     state: { sorting, pagination: { pageIndex, pageSize } },
     onSortingChange: setSorting,
-    onPaginationChange: (updater) => {
-      if (typeof updater === "function") {
-        const next = updater({ pageIndex, pageSize, pageSize });
-        setPageIndex(next.pageIndex);
-      }
-    },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     pageCount: Math.ceil(total / pageSize),
     manualPagination: true,
   });
@@ -148,30 +200,19 @@ export default function CasesPage() {
             </div>
             <select value={districtFilter} onChange={(e) => { setDistrictFilter(e.target.value); setPageIndex(0); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm">
               <option value="">All Districts</option>
-              <option value="1">Bengaluru Urban</option>
-              <option value="3">Mysuru</option>
-              <option value="4">Hubballi-Dharwad</option>
-              <option value="5">Belagavi</option>
-              <option value="6">Ballari</option>
+              {districts.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
             </select>
             <select value={crimeFilter} onChange={(e) => { setCrimeFilter(e.target.value); setPageIndex(0); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm">
               <option value="">All Crime Types</option>
-              <option value="1">Murder</option>
-              <option value="2">Robbery</option>
-              <option value="3">Burglary</option>
-              <option value="4">Assault</option>
-              <option value="5">Fraud</option>
-              <option value="7">Cyber Crime</option>
+              {crimeHeads.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPageIndex(0); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm">
               <option value="">All Statuses</option>
-              <option value="1">Under Investigation</option>
-              <option value="2">Chargesheet Filed</option>
-              <option value="3">Trial in Progress</option>
-              <option value="4">Convicted</option>
-              <option value="5">Acquitted</option>
-              <option value="6">Closed</option>
+              {statuses.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
+            <button onClick={() => { setSearchQuery(""); setDistrictFilter(""); setCrimeFilter(""); setStatusFilter(""); setPageIndex(0); }} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+              <RefreshCw className="h-4 w-4" />
+            </button>
           </div>
           <Link
             href="/cases/new"

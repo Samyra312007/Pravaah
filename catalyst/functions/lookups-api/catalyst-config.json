@@ -1,0 +1,23 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/lookups/districts", "method": "GET", "function": "index" },
+      { "path": "/lookups/crime-heads", "method": "GET", "function": "crime-heads" },
+      { "path": "/lookups/case-statuses", "method": "GET", "function": "case-statuses" },
+      { "path": "/lookups/units", "method": "GET", "function": "units" },
+      { "path": "/lookups/gravity-offences", "method": "GET", "function": "gravity-offences" },
+      { "path": "/lookups/case-categories", "method": "GET", "function": "case-categories" }
+    ],
+    "throttling": {
+      "enabled": true,
+      "rate": { "window_ms": 60000, "max_requests": 200 }
+    },
+    "authentication": {
+      "enabled": true,
+      "roles": ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR", "ANALYST"]
+    }
+  }
+}

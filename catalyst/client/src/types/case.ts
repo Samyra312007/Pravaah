@@ -76,6 +76,15 @@ export interface Chargesheet {
   IOID?: number;
 }
 
+export interface ReferenceInfo {
+  district?: { DistrictID: number; DistrictName: string };
+  unit?: { UnitID: number; UnitName: string };
+  status?: { CaseStatusID: number; CaseStatusName: string };
+  crimeHead?: { CrimeHeadID: number; CrimeGroupName: string };
+  gravity?: { GravityOffenceID: number; LookupValue: string };
+  category?: { CaseCategoryID: number; LookupValue: string };
+}
+
 export interface CaseDetail {
   master: CaseMaster;
   complainants: Complainant[];
@@ -84,6 +93,7 @@ export interface CaseDetail {
   actSections: ActSectionAssociation[];
   arrests: ArrestSurrender[];
   chargesheet?: Chargesheet;
+  references?: ReferenceInfo;
 }
 
 export interface CaseListItem {

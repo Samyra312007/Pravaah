@@ -152,3 +152,6 @@ INSERT INTO Court (CourtID, CourtName, DistrictID, StateID, Active) VALUES
 (3, 'Hubballi Sessions Court', 4, 1, TRUE),
 (4, 'Belagavi District Court', 5, 1, TRUE),
 (5, 'Ballari Sessions Court', 6, 1, TRUE);
+
+-- Phase 2: 200+ sample cases across 5 districts
+RUN SCRIPT '../seeds/seed_200_cases.sql';
