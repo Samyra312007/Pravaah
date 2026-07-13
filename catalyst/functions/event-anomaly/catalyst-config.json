@@ -1,0 +1,12 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "event",
+    "trigger": {
+      "type": "datastore",
+      "table": "CaseMaster",
+      "operation": "INSERT"
+    }
+  }
+}

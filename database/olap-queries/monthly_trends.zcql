@@ -1,0 +1,14 @@
+-- Monthly Crime Trends by District, Crime Head, and Case Category
+SELECT
+    YEAR(cm.CrimeRegisteredDate) AS year,
+    MONTH(cm.CrimeRegisteredDate) AS month,
+    d.DistrictName,
+    ch.CrimeGroupName,
+    cc.LookupValue AS case_category,
+    COUNT(cm.CaseMasterID) AS case_count
+FROM CaseMaster cm
+JOIN District d ON cm.UnitID IN (SELECT UnitID FROM Unit WHERE DistrictID = d.DistrictID)
+JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.CrimeHeadID
+JOIN CaseCategory cc ON cm.CaseCategoryID = cc.CaseCategoryID
+GROUP BY year, month, d.DistrictName, ch.CrimeGroupName, cc.LookupValue
+ORDER BY year DESC, month DESC;

@@ -1,0 +1,13 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/analytics/dashboard", "method": "GET", "function": "index" },
+      { "path": "/analytics/trends", "method": "GET", "function": "trends" },
+      { "path": "/analytics/hotspots", "method": "GET", "function": "hotspots" },
+      { "path": "/analytics/district/{id}", "method": "GET", "function": "district-stats" }
+    ]
+  }
+}

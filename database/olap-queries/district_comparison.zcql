@@ -1,0 +1,17 @@
+-- District Comparison Across Multiple KPIs
+SELECT
+    d.DistrictName,
+    COUNT(cm.CaseMasterID) AS total_cases,
+    SUM(CASE WHEN g_o.LookupValue = 'Heinous' THEN 1 ELSE 0 END) AS heinous_cases,
+    SUM(CASE WHEN cm.CaseStatusID IN (4,5) THEN 1 ELSE 0 END) AS resolved_cases,
+    ROUND(
+        SUM(CASE WHEN cm.CaseStatusID IN (4,5) THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(cm.CaseMasterID), 0),
+        2
+    ) AS clearance_rate,
+    COUNT(DISTINCT cm.PolicePersonID) AS investigators_deployed
+FROM District d
+LEFT JOIN Unit u ON d.DistrictID = u.DistrictID
+LEFT JOIN CaseMaster cm ON u.UnitID = cm.UnitID
+LEFT JOIN GravityOffence g_o ON cm.GravityOffenceID = g_o.GravityOffenceID
+GROUP BY d.DistrictName
+ORDER BY total_cases DESC;

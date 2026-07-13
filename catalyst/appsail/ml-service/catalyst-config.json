@@ -1,0 +1,15 @@
+{
+  "deployment": {
+    "type": "custom",
+    "runtime": "python311",
+    "port": 8000,
+    "health_check": {
+      "path": "/health",
+      "initial_delay": 30
+    },
+    "resources": {
+      "memory": 1024,
+      "cpu": 1
+    }
+  }
+}

@@ -1,0 +1,37 @@
+pipeline:
+  name: ksp-crime-intelligence-deploy
+  source:
+    provider: github
+    repo: karnataka-police/ksp-crime-intelligence
+    branch: main
+
+  triggers:
+    - push:
+        branches: [main]
+
+  stages:
+    - name: Build
+      steps:
+        - run: npm ci
+          directory: catalyst/client
+        - run: npm run build
+          directory: catalyst/client
+        - run: npm run export
+          directory: catalyst/client
+        - run: pip install -r requirements.txt
+          directory: catalyst/appsail/ml-service
+
+    - name: Deploy to Staging
+      environment: staging
+      steps:
+        - run: catalyst deploy --project ksp-crime-intelligence --environment staging
+
+    - name: Deploy to Production
+      environment: production
+      requires_approval: true
+      steps:
+        - run: catalyst deploy --project ksp-crime-intelligence --environment production
+
+  notifications:
+    - on: failure
+      email: devops@ksp.karnataka.gov.in

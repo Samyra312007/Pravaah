@@ -1,0 +1,7 @@
+CaseMasterID,CrimeNo,CaseNo,CrimeRegisteredDate,IncidentFromDate,IncidentToDate,latitude,longitude,BriefFacts,UnitID,CaseCategoryID,GravityOffenceID,CrimeMajorHeadID,CrimeMinorHeadID,CaseStatusID
+1,BLR/001/2026,CR/01/2026,2026-01-15,2026-01-14,2026-01-15,12.9716,77.5946,"Report of theft at electronic store",1,1,2,3,1,1
+2,B LR/002/2026,CR/02/2026,2026-02-20,2026-02-19,2026-02-20,12.9344,77.6101,"Assault reported in Wilson Garden",2,1,2,4,1,1
+3,MYS/001/2026,CR/03/2026,2026-03-10,2026-03-09,2026-03-10,12.2958,76.6394,"Burglary at residential property",3,1,2,3,2,1
+4,HBL/001/2026,CR/04/2026,2026-03-22,2026-03-21,2026-03-22,15.3647,75.1240,"Chain snatching incident",4,1,1,2,1,2
+5,BLG/001/2026,CR/05/2026,2026-04-05,2026-04-04,2026-04-05,15.8497,74.4977,"Cyber fraud complaint",5,1,2,7,1,1
+6,BLR/003/2026,CR/06/2026,2026-04-18,2026-04-17,2026-04-18,12.9716,77.5946,"Stolen vehicle recovery",1,1,2,9,2,3

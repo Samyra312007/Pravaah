@@ -1,0 +1,15 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/cases", "method": "GET", "function": "index" },
+      { "path": "/cases", "method": "POST", "function": "create" },
+      { "path": "/cases/{id}", "method": "GET", "function": "read" },
+      { "path": "/cases/{id}", "method": "PUT", "function": "update" },
+      { "path": "/cases/{id}", "method": "DELETE", "function": "delete" },
+      { "path": "/cases/search", "method": "GET", "function": "search" }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+DistrictID,DistrictName,Population,LiteracyRate,UrbanizationIndex,PopulationDensity,CrimeRatePer100K
+1,Bengaluru Urban,10200000,89.5,91.2,4381,450
+2,Bengaluru Rural,990000,78.4,22.5,456,180
+3,Mysuru,3200000,76.2,41.8,512,210
+4,Hubballi-Dharwad,2500000,75.1,38.5,412,195
+5,Belagavi,4800000,73.8,24.6,356,175
+6,Ballari,2600000,67.3,28.4,298,220
+7,Mangaluru,1300000,88.9,48.2,356,160
+8,Shivamogga,1800000,74.5,22.1,245,145
+9,Kalaburagi,2600000,63.2,18.5,278,190
+10,Udupi,1200000,86.2,32.4,312,120

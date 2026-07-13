@@ -1,0 +1,12 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/network/connections/{entityId}", "method": "GET", "function": "index" },
+      { "path": "/network/repeat-offenders", "method": "GET", "function": "repeat-offenders" },
+      { "path": "/network/associations", "method": "GET", "function": "associations" }
+    ]
+  }
+}

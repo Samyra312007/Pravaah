@@ -1,0 +1,16 @@
+DistrictID,DistrictName,StateID,Active
+1,Bengaluru Urban,1,TRUE
+2,Bengaluru Rural,1,TRUE
+3,Mysuru,1,TRUE
+4,Hubballi-Dharwad,1,TRUE
+5,Belagavi,1,TRUE
+6,Ballari,1,TRUE
+7,Mangaluru,1,TRUE
+8,Shivamogga,1,TRUE
+9,Kalaburagi,1,TRUE
+10,Udupi,1,TRUE
+11,Hassan,1,TRUE
+12,Chikkamagaluru,1,TRUE
+13,Davanagere,1,TRUE
+14,Tumakuru,1,TRUE
+15,Kolar,1,TRUE

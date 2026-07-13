@@ -1,0 +1,21 @@
+-- Spatiotemporal Hotspot Detection by Time-of-Day + Location
+SELECT
+    d.DistrictName,
+    CASE
+        WHEN HOUR(cm.CrimeRegisteredDate) BETWEEN 0 AND 5 THEN 'Late Night (00-05)'
+        WHEN HOUR(cm.CrimeRegisteredDate) BETWEEN 6 AND 11 THEN 'Morning (06-11)'
+        WHEN HOUR(cm.CrimeRegisteredDate) BETWEEN 12 AND 17 THEN 'Afternoon (12-17)'
+        ELSE 'Evening (18-23)'
+    END AS time_block,
+    ROUND(cm.latitude, 2) AS lat_bucket,
+    ROUND(cm.longitude, 2) AS lng_bucket,
+    ch.CrimeGroupName,
+    COUNT(cm.CaseMasterID) AS incident_count
+FROM CaseMaster cm
+JOIN Unit u ON cm.UnitID = u.UnitID
+JOIN District d ON u.DistrictID = d.DistrictID
+JOIN CrimeHead ch ON cm.CrimeMajorHeadID = ch.CrimeHeadID
+WHERE cm.latitude IS NOT NULL AND cm.longitude IS NOT NULL
+GROUP BY d.DistrictName, time_block, lat_bucket, lng_bucket, ch.CrimeGroupName
+HAVING incident_count > 2
+ORDER BY incident_count DESC;

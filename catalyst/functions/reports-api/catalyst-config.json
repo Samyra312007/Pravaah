@@ -1,0 +1,11 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/reports/generate", "method": "POST", "function": "index" },
+      { "path": "/reports/{id}/download", "method": "GET", "function": "generate-pdf" }
+    ]
+  }
+}
