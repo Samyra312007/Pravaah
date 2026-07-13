@@ -30,8 +30,9 @@ export default function LoginPage() {
         throw new Error("Invalid credentials");
       }
 
-      const data = await res.json();
-      setSession(data.token, data.user as User);
+      const body = await res.json();
+      const { token, user } = body.data;
+      setSession(token, user as User);
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

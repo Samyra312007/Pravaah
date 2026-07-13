@@ -36,7 +36,9 @@ INSERT INTO Unit (UnitID, UnitName, TypeID, ParentUnit, DistrictID, StateID, Act
 (7, 'Mangaluru East Police Station', 1, NULL, 7, 1, TRUE),
 (8, 'Shivamogga City Police Station', 1, NULL, 8, 1, TRUE),
 (9, 'Kalaburagi North Police Station', 1, NULL, 9, 1, TRUE),
-(10, 'Udupi Town Police Station', 1, NULL, 10, 1, TRUE);
+(10, 'Udupi Town Police Station', 1, NULL, 10, 1, TRUE),
+(11, 'Whitefield Police Station', 1, NULL, 1, 1, TRUE),
+(12, 'Vijayanagar Police Station', 1, NULL, 1, 1, TRUE);
 
 -- Case Categories
 INSERT INTO CaseCategory (CaseCategoryID, LookupValue) VALUES
@@ -96,3 +98,57 @@ INSERT INTO CrimeHead (CrimeHeadID, CrimeGroupName, Active) VALUES
 (8, 'Narcotics', TRUE),
 (9, 'Property Crime', TRUE),
 (10, 'Crime Against Women', TRUE);
+
+-- Acts
+INSERT INTO Act (ActCode, ActDescription, ShortName, Active) VALUES
+(1, 'Indian Penal Code', 'IPC', TRUE),
+(2, 'Code of Criminal Procedure', 'CrPC', TRUE),
+(3, 'Narcotic Drugs and Psychotropic Substances Act', 'NDPS Act', TRUE),
+(4, 'Information Technology Act', 'IT Act', TRUE),
+(5, 'Arms Act', 'Arms Act', TRUE),
+(6, 'Protection of Children from Sexual Offences Act', 'POCSO Act', TRUE);
+
+-- Sections
+INSERT INTO Section (ActCode, SectionCode, SectionDescription, Active) VALUES
+(1, '302', 'Punishment for murder', TRUE),
+(1, '304', 'Punishment for culpable homicide not amounting to murder', TRUE),
+(1, '307', 'Attempt to murder', TRUE),
+(1, '323', 'Punishment for voluntarily causing hurt', TRUE),
+(1, '325', 'Punishment for voluntarily causing grievous hurt', TRUE),
+(1, '354', 'Assault or criminal force to woman with intent to outrage her modesty', TRUE),
+(1, '363', 'Punishment for kidnapping', TRUE),
+(1, '376', 'Punishment for rape', TRUE),
+(1, '379', 'Punishment for theft', TRUE),
+(1, '392', 'Punishment for robbery', TRUE),
+(1, '420', 'Cheating and dishonestly inducing delivery of property', TRUE),
+(1, '457', 'Lurking house-trespass or house-breaking by night', TRUE),
+(1, '498A', 'Cruelty by husband or relatives', TRUE),
+(1, '500', 'Punishment for defamation', TRUE),
+(1, '34', 'Acts done by several persons in furtherance of common intention', TRUE),
+(2, '125', 'Security for keeping peace in other cases', TRUE),
+(2, '144', 'Power to issue order in urgent cases of nuisance', TRUE),
+(3, '20', 'Punishment for contravention in relation to cannabis', TRUE),
+(3, '21', 'Punishment for contravention in relation to manufactured drugs', TRUE),
+(4, '66', 'Computer related offences', TRUE),
+(4, '67', 'Publishing obscene material in electronic form', TRUE),
+(5, '25', 'License for acquisition and possession of firearms', TRUE),
+(5, '27', 'Punishment for using arms', TRUE),
+(6, '4', 'Punishment for penetrative sexual assault', TRUE),
+(6, '6', 'Punishment for aggravated penetrative sexual assault', TRUE);
+
+-- Employees
+INSERT INTO Employee (EmployeeID, DistrictID, UnitID, RankID, DesignationID, KGID, FirstName, GenderID) VALUES
+(1, 1, 1, 5, 1, 'KSP/BLR/001', 'Ravi Kumar', 1),
+(2, 1, 2, 5, 1, 'KSP/BLR/002', 'Suresh Gowda', 1),
+(3, 3, 3, 5, 1, 'KSP/MYS/001', 'Mohan Raj', 1),
+(4, 4, 4, 5, 1, 'KSP/HBL/001', 'Basavaraj Patil', 1),
+(5, 5, 5, 5, 1, 'KSP/BLG/001', 'Anil Kumar', 1),
+(6, 6, 6, 5, 1, 'KSP/BLR-B/001', 'Venkatesh Rao', 1);
+
+-- Courts
+INSERT INTO Court (CourtID, CourtName, DistrictID, StateID, Active) VALUES
+(1, 'Bengaluru City Civil Court', 1, 1, TRUE),
+(2, 'Mysuru District Court', 3, 1, TRUE),
+(3, 'Hubballi Sessions Court', 4, 1, TRUE),
+(4, 'Belagavi District Court', 5, 1, TRUE),
+(5, 'Ballari Sessions Court', 6, 1, TRUE);

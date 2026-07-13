@@ -6,10 +6,22 @@
     "routes": [
       { "path": "/cases", "method": "GET", "function": "index" },
       { "path": "/cases", "method": "POST", "function": "create" },
+      { "path": "/cases/search", "method": "GET", "function": "search" },
       { "path": "/cases/{id}", "method": "GET", "function": "read" },
       { "path": "/cases/{id}", "method": "PUT", "function": "update" },
       { "path": "/cases/{id}", "method": "DELETE", "function": "delete" },
-      { "path": "/cases/search", "method": "GET", "function": "search" }
+      { "path": "/cases/{id}/victims", "method": "GET", "function": "victims" },
+      { "path": "/cases/{id}/victims", "method": "POST", "function": "victims" },
+      { "path": "/cases/{id}/accused", "method": "GET", "function": "accused" },
+      { "path": "/cases/{id}/accused", "method": "POST", "function": "accused" },
+      { "path": "/cases/{id}/complainants", "method": "GET", "function": "complainants" },
+      { "path": "/cases/{id}/complainants", "method": "POST", "function": "complainants" },
+      { "path": "/cases/{id}/act-sections", "method": "GET", "function": "act-sections" },
+      { "path": "/cases/{id}/act-sections", "method": "POST", "function": "act-sections" },
+      { "path": "/cases/{id}/chargesheet", "method": "GET", "function": "chargesheet" },
+      { "path": "/cases/{id}/chargesheet", "method": "POST", "function": "chargesheet" },
+      { "path": "/cases/{id}/arrests", "method": "GET", "function": "arrests" },
+      { "path": "/cases/{id}/arrests", "method": "POST", "function": "arrests" }
     ]
   }
 }

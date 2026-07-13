@@ -1,0 +1,11 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/auth/login", "method": "POST", "function": "login" },
+      { "path": "/auth/me", "method": "GET", "function": "me" }
+    ]
+  }
+}
