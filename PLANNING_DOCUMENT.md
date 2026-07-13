@@ -452,7 +452,7 @@ Data-level access is enforced within **Catalyst Functions** using the authentica
 
 ## 8. Implementation Phases
 
-### Phase 1 — Foundation (Weeks 1-3)
+### Phase 1 — Foundation (Days 1-3)
 
 **Objective:** Scaffold the entire project on Catalyst, create database tables, set up auth, and deploy a basic shell.
 
@@ -469,7 +469,7 @@ Data-level access is enforced within **Catalyst Functions** using the authentica
 | 1.9 | Deploy Next.js static export to Catalyst Slate | Slate |
 | **Deliverable** | Catalyst project live, database ready, auth working, empty app shell deployed | |
 
-### Phase 2 — Core CRUD (Weeks 4-5)
+### Phase 2 — Core CRUD (Days 4-5)
 
 **Objective:** Full case management functionality with search and filtering.
 
@@ -486,7 +486,7 @@ Data-level access is enforced within **Catalyst Functions** using the authentica
 | 2.9 | Seed sample data: 200+ cases across 5 districts, 10 police stations | Data Store |
 | **Deliverable** | Full case management: create, read, update, search, filter | |
 
-### Phase 3 — Visualization Suite (Weeks 6-9)
+### Phase 3 — Visualization Suite (Days 6-9)
 
 **Objective:** Interactive dashboards, geospatial maps, and trend alerts.
 
@@ -506,7 +506,7 @@ Data-level access is enforced within **Catalyst Functions** using the authentica
 | 3.12 | OLAP queries configured for fast aggregation | Data Store OLAP |
 | **Deliverable** | Interactive dashboard with KPIs, maps with heatmap + drill-down, trend alerts | |
 
-### Phase 4 — Network & Link Analysis (Weeks 10-11)
+### Phase 4 — Network & Link Analysis (Days 10-11)
 
 **Objective:** Node-based visualization connecting suspects, victims, cases, and locations.
 
@@ -524,7 +524,7 @@ Data-level access is enforced within **Catalyst Functions** using the authentica
 | 4.10 | Build association table: sortable grid of connections | — |
 | **Deliverable** | Interactive network graph with search, repeat offender profiles, association detection | |
 
-### Phase 5 — ML Intelligence (Weeks 12-15)
+### Phase 5 — ML Intelligence (Days 12-15)
 
 **Objective:** AI-driven predictions, anomaly detection, and socio-economic correlation.
 
@@ -544,7 +544,7 @@ Data-level access is enforced within **Catalyst Functions** using the authentica
 | 5.12 | Socio-economic correlation charts (scatter plot, regression line) | — |
 | **Deliverable** | Predictive risk scores, anomaly flags, socio-economic correlation visualizations | |
 
-### Phase 6 — Intelligence Reports & Alerts (Weeks 16-17)
+### Phase 6 — Intelligence Reports & Alerts (Days 16-17)
 
 **Objective:** Automated PDF reports, scheduled digests, and notification system.
 
