@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, MapPin, Calendar, User, Scale, FileText,
-  Pencil, Trash2, Plus, X, Check,
+  Pencil, Trash2, Plus, X, Check, Download, Loader2,
 } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
 import { api } from "@/lib/catalyst";
@@ -58,6 +58,31 @@ export default function CaseDetailPage() {
     await updateCase.updateCase(caseId, editForm);
     setIsEditing(false);
     refetch();
+  };
+
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPDF = async () => {
+    setExporting(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/reports/case-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ caseId: parseInt(caseId), reportType: "case-report" }),
+      });
+      const data = await res.json();
+      if (data.status === "success" && data.data?.downloadUrl) {
+        window.open(data.data.downloadUrl, "_blank");
+      } else {
+        alert("Failed to generate PDF report");
+      }
+    } catch (err) {
+      console.error("Export failed", err);
+      alert("Export failed");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -197,6 +222,10 @@ export default function CaseDetailPage() {
             <p className="text-sm text-gray-400">{master.CaseNo ? `Case No: ${master.CaseNo}` : ""}</p>
           </div>
           <div className="flex gap-2">
+            <button onClick={handleExportPDF} disabled={exporting} className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50">
+              {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              {exporting ? "Exporting..." : "Export PDF"}
+            </button>
             <button onClick={handleEdit} className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
               <Pencil className="h-4 w-4" /> Edit
             </button>
