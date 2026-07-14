@@ -16,7 +16,6 @@ async function handler(context) {
     `;
     const rows = await query.execute(zcql);
 
-    // Aggregate into monthly totals across all crime heads
     const monthlyTotals = {};
     for (const r of rows) {
       const key = `${r.year}-${String(r.month).padStart(2, "0")}`;
@@ -25,14 +24,12 @@ async function handler(context) {
     const monthlyKeys = Object.keys(monthlyTotals).sort();
     const counts = monthlyKeys.map((k) => monthlyTotals[k]);
 
-    // Compute mean and standard deviation
     const n = counts.length;
     const mean = counts.reduce((s, v) => s + v, 0) / n;
     const variance = counts.reduce((s, v) => s + (v - mean) ** 2, 0) / n;
     const stdDev = Math.sqrt(variance);
     const threshold = mean + 2 * stdDev;
 
-    // Generate trend alerts when a monthly count exceeds 2σ
     const alerts = [];
     for (let i = 0; i < monthlyKeys.length; i++) {
       if (counts[i] > threshold) {
@@ -52,7 +49,33 @@ async function handler(context) {
     await cache.put("trend_alerts", JSON.stringify(alerts), 43200);
     await cache.put("trend_stats", JSON.stringify({ mean: Math.round(mean), stdDev: Math.round(stdDev), threshold: Math.round(threshold), totalMonths: n }), 43200);
 
-    // ── 2. Call ML service for risk score recalculation ──
+    // ── 2. Send email alerts to SPs if anomalies detected ──
+    if (alerts.length > 0) {
+      try {
+        const mail = app.mail();
+        const alertHtml = alerts.map(a =>
+          `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin-bottom:12px;">
+            <h4 style="margin:0 0 4px;color:#b91c1c;">Alert: ${a.period}</h4>
+            <p style="margin:0;font-size:13px;color:#7f1d1d;">${a.message}</p>
+            <p style="margin:4px 0 0;font-size:11px;color:#b91c1c;">Deviation: ${a.deviation}% above mean</p>
+          </div>`
+        ).join("");
+
+        await mail.sendMail({
+          to: ["scrb-team@ksp.karnataka.gov.in", "sp-intelligence@ksp.karnataka.gov.in"],
+          subject: `KSP Trend Alert: ${alerts.length} anomaly(ies) detected`,
+          html: `<h3>Crime Trend Anomalies Detected</h3>
+                 <p>The nightly trend analysis has identified ${alerts.length} period(s) with statistically significant deviations.</p>
+                 ${alertHtml}
+                 <hr/><p style="font-size:11px;color:#64748b;">KSP Crime Intelligence Platform · Automated Alert</p>`,
+          category: "trend-alert",
+        });
+      } catch (mailErr) {
+        console.warn("Failed to send trend alert email:", mailErr.message);
+      }
+    }
+
+    // ── 3. Call ML service for risk score recalculation ──
     const mlEndpoint = process.env.ML_SERVICE_URL || "https://ml-service.ksp.catalystappsail.in";
     const districts = [
       { id: 1, name: "Bengaluru Urban" }, { id: 2, name: "Bengaluru Rural" }, { id: 3, name: "Mysuru" },
@@ -81,6 +104,7 @@ async function handler(context) {
       recordsProcessed: rows.length,
       alertsGenerated: alerts.length,
       riskScoresUpdated: riskScores.length,
+      emailsSent: alerts.length > 0 ? 1 : 0,
     };
   } catch (err) {
     console.error("Nightly trend job failed:", err.message);

@@ -1,0 +1,11 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/circuits/generate-report", "method": "POST", "function": "report-pipeline" },
+      { "path": "/circuits/status/{pipelineId}", "method": "GET", "function": "pipeline-status" }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "deployment": {
+    "stack": "node18",
+    "type": "advancedio",
+    "function_type": "api",
+    "routes": [
+      { "path": "/mail/send-alert", "method": "POST", "function": "send-alert" },
+      { "path": "/mail/send-report", "method": "POST", "function": "send-report" },
+      { "path": "/mail/send-notification", "method": "POST", "function": "send-notification" }
+    ]
+  }
+}
