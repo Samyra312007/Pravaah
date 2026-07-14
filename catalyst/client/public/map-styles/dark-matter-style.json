@@ -1,0 +1,45 @@
+{
+  "version": 8,
+  "name": "KSP Dark Matter",
+  "metadata": { "ksp:description": "KSP crime intelligence base map — dark theme" },
+  "sources": {
+    "basemap": {
+      "type": "raster",
+      "tiles": ["https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"],
+      "tileSize": 256,
+      "attribution": "© CARTO"
+    },
+    "karnataka-districts": {
+      "type": "geojson",
+      "data": "/map-styles/karnataka-districts.geojson"
+    }
+  },
+  "layers": [
+    {
+      "id": "basemap-layer",
+      "type": "raster",
+      "source": "basemap",
+      "minzoom": 0,
+      "maxzoom": 22
+    },
+    {
+      "id": "district-fill",
+      "type": "fill",
+      "source": "karnataka-districts",
+      "paint": {
+        "fill-color": "#2C4A7C",
+        "fill-opacity": 0.08
+      }
+    },
+    {
+      "id": "district-outline",
+      "type": "line",
+      "source": "karnataka-districts",
+      "paint": {
+        "line-color": "#ffffff",
+        "line-width": 1.5,
+        "line-opacity": 0.5
+      }
+    }
+  ]
+}

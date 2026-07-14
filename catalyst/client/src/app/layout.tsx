@@ -14,6 +14,7 @@ const inter = Inter({ subsets: ["latin"] });
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/maps": "Geospatial Analysis",
+  "/drill-down": "Drill-Down Navigation",
   "/network": "Network & Link Analysis",
   "/cases": "Case Management",
   "/reports": "Intelligence Reports",

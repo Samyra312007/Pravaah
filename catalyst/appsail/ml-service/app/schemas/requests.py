@@ -39,7 +39,14 @@ class CorrelationRequest(BaseModel):
     indicators: Optional[List[str]] = None
 
 
+class VariableDetail(BaseModel):
+    indicator: str
+    coefficient: float
+    p_value: float
+    significant: bool
+
 class CorrelationResponse(BaseModel):
     correlation_coefficient: float
     p_value: float
     significant_variables: List[str]
+    details: Optional[List[VariableDetail]] = None

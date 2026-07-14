@@ -5,7 +5,12 @@
     "function_type": "api",
     "routes": [
       { "path": "/reports/generate", "method": "POST", "function": "index" },
-      { "path": "/reports/{id}/download", "method": "GET", "function": "generate-pdf" }
+      { "path": "/reports/district-summary", "method": "POST", "function": "generate-district-report" },
+      { "path": "/reports/case-report", "method": "POST", "function": "index" },
+      { "path": "/reports/{id}/download", "method": "GET", "function": "generate-pdf" },
+      { "path": "/reports/download", "method": "GET", "function": "generate-pdf" },
+      { "path": "/reports/export/csv", "method": "GET", "function": "export-csv" },
+      { "path": "/reports/export/case-pdf", "method": "POST", "function": "generate-pdf" }
     ],
     "throttling": {
       "enabled": true,

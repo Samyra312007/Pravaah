@@ -21,4 +21,5 @@ async def correlate_socioeconomic(request: CorrelationRequest):
 
 @router.get("/socioeconomic")
 async def get_correlation_data():
-    return {"correlations": []}
+    result = model.analyze({})
+    return {"correlations": result}

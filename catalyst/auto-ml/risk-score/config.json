@@ -1,0 +1,32 @@
+{
+  "modelName": "KSP Crime Risk Score",
+  "description": "Predicts district-level crime risk score (0-1) for the next quarter using historical case data and census indicators",
+  "algorithm": "RandomForestRegressor",
+  "targetColumn": "risk_score",
+  "featureColumns": [
+    "cases_last_quarter",
+    "crime_rate_per_100k",
+    "population_density",
+    "urbanization_index",
+    "literacy_rate",
+    "avg_response_time",
+    "repeat_offender_ratio"
+  ],
+  "categoricalColumns": ["district_id"],
+  "trainingConfig": {
+    "testSplit": 0.2,
+    "crossValidationFolds": 5,
+    "maxModelSize": "10MB",
+    "optimizationMetric": "RMSE"
+  },
+  "dataSource": {
+    "type": "csv",
+    "source": "Catalyst Data Store export via ZCQL",
+    "exportScript": "../export-training-data.js",
+    "schedule": "monthly"
+  },
+  "output": {
+    "modelFormat": "pkl",
+    "targetPath": "../appsail/ml-service/trained_models/risk_score_model.pkl"
+  }
+}

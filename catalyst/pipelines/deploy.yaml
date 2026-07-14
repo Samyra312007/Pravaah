@@ -7,29 +7,91 @@ pipeline:
 
   triggers:
     - push:
+        branches: [main, staging]
+    - pull_request:
         branches: [main]
 
+  env:
+    ML_SERVICE_URL: "https://ml-service.ksp.catalystappsail.in"
+    JWT_SECRET: "${JWT_SECRET}"
+    NODE_ENV: "production"
+    APP_URL: "https://ksp-crime.karnataka.gov.in"
+
+  cache:
+    - path: catalyst/client/.next/cache
+      key: next-build-{{ .Branch }}
+    - path: catalyst/client/node_modules
+      key: node-modules-{{ checksum "catalyst/client/package-lock.json" }}
+    - path: catalyst/appsail/ml-service/trained_models
+      key: ml-models-{{ .Branch }}
+    - path: catalyst/appsail/ml-service/__pycache__
+      key: ml-cache-{{ .Branch }}
+
   stages:
+    - name: Security & Lint
+      steps:
+        - run: npm ci
+          directory: catalyst/client
+        - run: npm run lint
+          directory: catalyst/client
+        - run: npx tsc --noEmit
+          directory: catalyst/client
+        - run: pip install -r requirements.txt --quiet
+          directory: catalyst/appsail/ml-service
+        - run: python -m py_compile app/main.py app/api/*.py app/models/*.py app/services/*.py app/schemas/*.py
+          directory: catalyst/appsail/ml-service
+        - run: npm run audit --production
+          directory: catalyst/client
+          ignore_failure: true
+
     - name: Build
       steps:
         - run: npm ci
           directory: catalyst/client
         - run: npm run build
           directory: catalyst/client
-        - run: pip install -r requirements.txt
+        - run: pip install -r requirements.txt --quiet
+          directory: catalyst/appsail/ml-service
+        - run: python -c "from app.models.risk_model import RiskScoreModel; m = RiskScoreModel(); print('Risk model ready')"
+          directory: catalyst/appsail/ml-service
+        - run: python -c "from app.models.anomaly_model import AnomalyDetectionModel; m = AnomalyDetectionModel(); print('Anomaly model ready')"
           directory: catalyst/appsail/ml-service
 
     - name: Deploy to Staging
       environment: staging
+      requires_approval: false
+      env:
+        ML_SERVICE_URL: "https://ml-service-staging.ksp.catalystappsail.in"
+        APP_URL: "https://staging.ksp-crime.karnataka.gov.in"
       steps:
         - run: catalyst deploy --project ksp-crime-intelligence --environment staging
+
+    - name: Integration Tests
+      environment: staging
+      steps:
+        - run: curl -f $ML_SERVICE_URL/health || exit 1
+        - run: curl -f $ML_SERVICE_URL/predict/risk-score/1 || exit 1
+        - run: curl -f $APP_URL/api/health || exit 1
+        - run: curl -f "$APP_URL/api/cases?page=1&perPage=1" -H "Authorization: Bearer ${JWT_SECRET}" || exit 1
 
     - name: Deploy to Production
       environment: production
       requires_approval: true
+      env:
+        ML_SERVICE_URL: "https://ml-service.ksp.catalystappsail.in"
+        APP_URL: "https://ksp-crime.karnataka.gov.in"
       steps:
         - run: catalyst deploy --project ksp-crime-intelligence --environment production
+
+  rollback:
+    enabled: true
+    auto_rollback: true
+    max_rollback_attempts: 3
 
   notifications:
     - on: failure
       email: devops@ksp.karnataka.gov.in
+    - on: success
+      email: scrb-team@ksp.karnataka.gov.in
+    - on: rollback
+      email: [devops@ksp.karnataka.gov.in, scrb-team@ksp.karnataka.gov.in]

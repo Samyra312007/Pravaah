@@ -11,12 +11,14 @@ import {
   FileText,
   Shield,
   LogOut,
+  GitBranch,
 } from "lucide-react";
 import type { User } from "@/types/common";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/maps", label: "Maps", icon: Map },
+  { href: "/maps", label: "Geospatial Maps", icon: Map },
+  { href: "/drill-down", label: "Drill-Down Nav", icon: GitBranch },
   { href: "/network", label: "Network Analysis", icon: Share2 },
   { href: "/cases", label: "Cases", icon: FolderSearch },
   { href: "/reports", label: "Reports", icon: FileText },

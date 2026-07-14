@@ -173,9 +173,10 @@ export default function CasesPage() {
     manualPagination: true,
   });
 
-  const SortIcon = ({ column }: { column: { isSorted: false | "asc" | "desc" } }) => {
-    if (!column.isSorted) return <ArrowUpDown className="h-3 w-3 ml-1 inline opacity-30" />;
-    return column.isSorted === "asc"
+  const SortIcon = ({ column }: { column: { getIsSorted: () => false | "asc" | "desc" } }) => {
+    const sorted = column.getIsSorted();
+    if (!sorted) return <ArrowUpDown className="h-3 w-3 ml-1 inline opacity-30" />;
+    return sorted === "asc"
       ? <ArrowUp className="h-3 w-3 ml-1 inline text-ksp-blue" />
       : <ArrowDown className="h-3 w-3 ml-1 inline text-ksp-blue" />;
   };

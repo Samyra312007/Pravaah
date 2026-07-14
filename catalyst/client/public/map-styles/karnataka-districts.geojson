@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "properties": { "name": "Bengaluru Urban", "id": 1 }, "geometry": { "type": "Polygon", "coordinates": [[[77.45,12.82],[77.75,12.82],[77.75,13.05],[77.45,13.05],[77.45,12.82]]] } },
+    { "type": "Feature", "properties": { "name": "Bengaluru Rural", "id": 2 }, "geometry": { "type": "Polygon", "coordinates": [[[77.30,12.75],[77.60,12.75],[77.60,13.10],[77.30,13.10],[77.30,12.75]]] } },
+    { "type": "Feature", "properties": { "name": "Mysuru", "id": 3 }, "geometry": { "type": "Polygon", "coordinates": [[[76.45,12.10],[76.85,12.10],[76.85,12.60],[76.45,12.60],[76.45,12.10]]] } },
+    { "type": "Feature", "properties": { "name": "Hubballi-Dharwad", "id": 4 }, "geometry": { "type": "Polygon", "coordinates": [[[74.90,15.20],[75.20,15.20],[75.20,15.55],[74.90,15.55],[74.90,15.20]]] } },
+    { "type": "Feature", "properties": { "name": "Belagavi", "id": 5 }, "geometry": { "type": "Polygon", "coordinates": [[[74.20,15.60],[74.80,15.60],[74.80,16.10],[74.20,16.10],[74.20,15.60]]] } },
+    { "type": "Feature", "properties": { "name": "Kalaburagi", "id": 6 }, "geometry": { "type": "Polygon", "coordinates": [[[76.60,17.10],[77.40,17.10],[77.40,17.80],[76.60,17.80],[76.60,17.10]]] } },
+    { "type": "Feature", "properties": { "name": "Mangaluru", "id": 7 }, "geometry": { "type": "Polygon", "coordinates": [[[74.70,12.70],[75.00,12.70],[75.00,13.20],[74.70,13.20],[74.70,12.70]]] } },
+    { "type": "Feature", "properties": { "name": "Shivamogga", "id": 8 }, "geometry": { "type": "Polygon", "coordinates": [[[75.00,13.60],[75.70,13.60],[75.70,14.20],[75.00,14.20],[75.00,13.60]]] } },
+    { "type": "Feature", "properties": { "name": "Ballari", "id": 9 }, "geometry": { "type": "Polygon", "coordinates": [[[76.50,14.90],[77.20,14.90],[77.20,15.60],[76.50,15.60],[76.50,14.90]]] } },
+    { "type": "Feature", "properties": { "name": "Davangere", "id": 10 }, "geometry": { "type": "Polygon", "coordinates": [[[75.40,14.00],[76.10,14.00],[76.10,14.60],[75.40,14.60],[75.40,14.00]]] } },
+    { "type": "Feature", "properties": { "name": "Tumakuru", "id": 11 }, "geometry": { "type": "Polygon", "coordinates": [[[76.80,13.10],[77.30,13.10],[77.30,13.80],[76.80,13.80],[76.80,13.10]]] } },
+    { "type": "Feature", "properties": { "name": "Udupi", "id": 12 }, "geometry": { "type": "Polygon", "coordinates": [[[74.60,13.10],[74.90,13.10],[74.90,13.70],[74.60,13.70],[74.60,13.10]]] } },
+    { "type": "Feature", "properties": { "name": "Hassan", "id": 13 }, "geometry": { "type": "Polygon", "coordinates": [[[75.70,12.70],[76.40,12.70],[76.40,13.30],[75.70,13.30],[75.70,12.70]]] } },
+    { "type": "Feature", "properties": { "name": "Raichur", "id": 14 }, "geometry": { "type": "Polygon", "coordinates": [[[76.60,15.80],[77.40,15.80],[77.40,16.50],[76.60,16.50],[76.60,15.80]]] } },
+    { "type": "Feature", "properties": { "name": "Kolar", "id": 15 }, "geometry": { "type": "Polygon", "coordinates": [[[77.80,12.80],[78.30,12.80],[78.30,13.40],[77.80,13.40],[77.80,12.80]]] } }
+  ]
+}

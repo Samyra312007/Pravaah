@@ -47,3 +47,27 @@ export interface RiskScore {
   riskLevel: "Low" | "Medium" | "High" | "Critical";
   factors: Record<string, number>;
 }
+
+export interface AnomalyData {
+  caseId: number;
+  district: string;
+  crimeHead: string;
+  anomalyScore: number;
+  isAnomaly: boolean;
+  registeredDate: string;
+  description: string;
+}
+
+export interface SocioEconomicData {
+  indicator: string;
+  coefficient: number;
+  pValue: number;
+  significant: boolean;
+}
+
+export interface SocioEconomicCorrelation {
+  correlationCoefficient: number;
+  pValue: number;
+  significantVariables: string[];
+  details: SocioEconomicData[];
+}
