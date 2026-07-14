@@ -9,6 +9,11 @@ pipeline:
     - push:
         branches: [main, staging]
 
+  env:
+    ML_SERVICE_URL: "https://ml-service.ksp.catalystappsail.in"
+    JWT_SECRET: "${JWT_SECRET}"
+    NODE_ENV: "production"
+
   cache:
     - path: catalyst/client/.next/cache
       key: next-build-{{ .Branch }}
@@ -47,18 +52,22 @@ pipeline:
     - name: Deploy to Staging
       environment: staging
       requires_approval: false
+      env:
+        ML_SERVICE_URL: "https://ml-service-staging.ksp.catalystappsail.in"
       steps:
         - run: catalyst deploy --project ksp-crime-intelligence --environment staging
 
     - name: Integration Tests
       environment: staging
       steps:
-        - run: curl -f http://staging-ksp.catalystappsail.in/health || exit 1
-        - run: curl -f http://staging-ksp.catalystappsail.in/predict/risk-score/1 || exit 1
+        - run: curl -f $ML_SERVICE_URL/health || exit 1
+        - run: curl -f $ML_SERVICE_URL/predict/risk-score/1 || exit 1
 
     - name: Deploy to Production
       environment: production
       requires_approval: true
+      env:
+        ML_SERVICE_URL: "https://ml-service.ksp.catalystappsail.in"
       steps:
         - run: catalyst deploy --project ksp-crime-intelligence --environment production
 
