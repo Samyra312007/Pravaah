@@ -46,6 +46,7 @@ export default function CaseDetailPage() {
   const [newComplainant, setNewComplainant] = useState({ ComplainantName: "", AgeYear: "" });
   const [newSection, setNewSection] = useState({ ActID: "", SectionID: "" });
   const [addingTo, setAddingTo] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const handleEdit = () => {
     if (caseDetail) {
@@ -59,8 +60,6 @@ export default function CaseDetailPage() {
     setIsEditing(false);
     refetch();
   };
-
-  const [exporting, setExporting] = useState(false);
 
   const handleExportPDF = async () => {
     setExporting(true);

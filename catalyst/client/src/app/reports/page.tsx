@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, Download, Calendar, MapPin, Loader2, CheckCircle, AlertCircle, Mail, FileDown } from "lucide-react";
+import { FileText, Download, Loader2, CheckCircle, AlertCircle, FileDown } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
 import { api } from "@/lib/catalyst";
 import { formatDate } from "@/lib/utils";

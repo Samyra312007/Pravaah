@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Home, MapPin, Building2, FolderSearch, Shield, ArrowLeft } from "lucide-react";
+import { ChevronRight, Home, MapPin, Building2, Shield } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
 import type { Role } from "@/types/common";
 
