@@ -7,22 +7,54 @@ pipeline:
 
   triggers:
     - push:
-        branches: [main]
+        branches: [main, staging]
+
+  cache:
+    - path: catalyst/client/.next/cache
+      key: next-build-{{ .Branch }}
+    - path: catalyst/client/node_modules
+      key: node-modules-{{ checksum "catalyst/client/package-lock.json" }}
+    - path: catalyst/appsail/ml-service/trained_models
+      key: ml-models-{{ .Branch }}
 
   stages:
+    - name: Lint & Type Check
+      steps:
+        - run: npm ci
+          directory: catalyst/client
+        - run: npm run lint
+          directory: catalyst/client
+        - run: npx tsc --noEmit
+          directory: catalyst/client
+        - run: pip install -r requirements.txt --quiet
+          directory: catalyst/appsail/ml-service
+        - run: python -m py_compile app/main.py app/api/*.py app/models/*.py app/services/*.py app/schemas/*.py
+          directory: catalyst/appsail/ml-service
+
     - name: Build
       steps:
         - run: npm ci
           directory: catalyst/client
         - run: npm run build
           directory: catalyst/client
-        - run: pip install -r requirements.txt
+        - run: pip install -r requirements.txt --quiet
+          directory: catalyst/appsail/ml-service
+        - run: python -c "from app.models.risk_model import RiskScoreModel; m = RiskScoreModel(); print('Risk model ready')"
+          directory: catalyst/appsail/ml-service
+        - run: python -c "from app.models.anomaly_model import AnomalyDetectionModel; m = AnomalyDetectionModel(); print('Anomaly model ready')"
           directory: catalyst/appsail/ml-service
 
     - name: Deploy to Staging
       environment: staging
+      requires_approval: false
       steps:
         - run: catalyst deploy --project ksp-crime-intelligence --environment staging
+
+    - name: Integration Tests
+      environment: staging
+      steps:
+        - run: curl -f http://staging-ksp.catalystappsail.in/health || exit 1
+        - run: curl -f http://staging-ksp.catalystappsail.in/predict/risk-score/1 || exit 1
 
     - name: Deploy to Production
       environment: production
@@ -33,3 +65,5 @@ pipeline:
   notifications:
     - on: failure
       email: devops@ksp.karnataka.gov.in
+    - on: success
+      email: scrb-team@ksp.karnataka.gov.in

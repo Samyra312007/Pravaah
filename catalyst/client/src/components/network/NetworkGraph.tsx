@@ -234,29 +234,56 @@ export function NetworkGraph({
   useEffect(() => {
     if (!simRef.current) return;
     const nodes = simRef.current.nodes();
-    const searchLower = searchQuery.toLowerCase().trim();
 
-    const connectedIds = searchLower
-      ? new Set(staticEdges.flatMap((e) => {
-          const src = typeof e.source === "string" ? e.source : (e.source as SimNode).id;
-          const tgt = typeof e.target === "string" ? e.target : (e.target as SimNode).id;
-          return [src, tgt];
-        }).filter((id) => {
-          const node = staticNodes.find((n) => n.id === id);
-          return node?.label.toLowerCase().includes(searchLower);
-        }).flatMap((id) => Array.from(getConnectedIds(id))))
-      : null;
+    const searchLower = searchQuery.toLowerCase().trim();
+    let searchMatchIds: Set<string> | null = null;
+    let firstDegreeIds: Set<string> | null = null;
+    let secondDegreeIds: Set<string> | null = null;
+
+    if (searchLower) {
+      // Find directly matched nodes
+      const directMatchIds = new Set(
+        staticNodes
+          .filter((n) => n.label.toLowerCase().includes(searchLower))
+          .map((n) => n.id)
+      );
+
+      // Compute 1st degree: nodes directly connected to matched nodes
+      firstDegreeIds = new Set(directMatchIds);
+      directMatchIds.forEach((id) => {
+        getConnectedIds(id).forEach((nid) => firstDegreeIds?.add(nid));
+      });
+
+      // Compute 2nd degree: nodes connected to 1st degree nodes
+      secondDegreeIds = new Set(firstDegreeIds);
+      firstDegreeIds.forEach((id) => {
+        getConnectedIds(id).forEach((nid) => secondDegreeIds?.add(nid));
+      });
+
+      // These are the overall visible nodes
+      searchMatchIds = secondDegreeIds;
+    }
 
     const svg = select(svgRef.current);
     svg.selectAll(".nodes g circle").each(function () {
       const el = select(this);
       const d = el.datum() as SimNode;
       if (!searchLower) {
-        el.transition().duration(300).attr("opacity", 1);
+        el.transition().duration(300).attr("opacity", 1).attr("stroke-width", 2.5).attr("stroke", "#fff");
         return;
       }
-      const isHighlighted = connectedIds?.has(d.id);
-      el.transition().duration(300).attr("opacity", isHighlighted ? 1 : 0.15);
+
+      const isDirectMatch = firstDegreeIds?.has(d.id) && staticNodes.some((n) => n.id === d.id && n.label.toLowerCase().includes(searchLower));
+      const isFirstDegree = !isDirectMatch && getConnectedIds(d.id).size > 0 && Array.from(getConnectedIds(d.id)).some((cid) => {
+        const cn = staticNodes.find((n) => n.id === cid);
+        return cn?.label.toLowerCase().includes(searchLower);
+      });
+      const isSecondDegree = !isDirectMatch && !isFirstDegree && secondDegreeIds?.has(d.id);
+
+      el.transition().duration(300)
+        .attr("opacity", isDirectMatch || isFirstDegree || isSecondDegree ? 1 : 0.12)
+        .attr("stroke-width", isDirectMatch ? 4 : isFirstDegree ? 3 : isSecondDegree ? 2 : 2.5)
+        .attr("stroke", isDirectMatch ? "#F59E0B" : isFirstDegree ? "#34D399" : isSecondDegree ? "#60A5FA" : "#fff");
     });
 
     svg.selectAll(".edges line").each(function () {
@@ -268,8 +295,15 @@ export function NetworkGraph({
         el.transition().duration(300).attr("opacity", 0.5);
         return;
       }
-      const isHighlighted = connectedIds?.has(srcId) && connectedIds?.has(tgtId);
-      el.transition().duration(300).attr("opacity", isHighlighted ? 0.8 : 0.04);
+      const isHighlighted = searchMatchIds?.has(srcId) && searchMatchIds?.has(tgtId);
+      if (isHighlighted) {
+        const srcFirst = firstDegreeIds?.has(srcId);
+        const tgtFirst = firstDegreeIds?.has(tgtId);
+        const isEdge1st = srcFirst && tgtFirst;
+        el.transition().duration(300).attr("opacity", 0.8).attr("stroke", isEdge1st ? "#34D399" : "#60A5FA");
+      } else {
+        el.transition().duration(300).attr("opacity", 0.04).attr("stroke", "#94A3B8");
+      }
     });
 
     svg.selectAll(".labels text").each(function () {
@@ -279,7 +313,7 @@ export function NetworkGraph({
         el.transition().duration(300).attr("opacity", 1);
         return;
       }
-      const isHighlighted = connectedIds?.has(d.id);
+      const isHighlighted = searchMatchIds?.has(d.id);
       el.transition().duration(300).attr("opacity", isHighlighted ? 1 : 0.1);
     });
   }, [searchQuery, staticNodes, staticEdges, getConnectedIds]);

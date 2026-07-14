@@ -1,8 +1,12 @@
+import sys
 import os
 import joblib
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor, IsolationForest
 from scipy import stats as _  # ensures scipy is importable
+
+# Force UTF-8 for stdout
+sys.stdout.reconfigure(encoding="utf-8")
 
 BASE = os.path.join(os.path.dirname(__file__), "../../trained_models")
 os.makedirs(BASE, exist_ok=True)
@@ -30,7 +34,7 @@ def train_risk_model():
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     model.fit(X, y)
     joblib.dump(model, os.path.join(BASE, "risk_score_model.pkl"))
-    print("✓ risk_score_model.pkl saved")
+    print("[OK] risk_score_model.pkl saved")
 
 
 def train_anomaly_model():
@@ -50,7 +54,7 @@ def train_anomaly_model():
     model = IsolationForest(n_estimators=100, contamination=0.05, random_state=42)
     model.fit(X)
     joblib.dump(model, os.path.join(BASE, "anomaly_model.pkl"))
-    print("✓ anomaly_model.pkl saved")
+    print("[OK] anomaly_model.pkl saved")
 
 
 if __name__ == "__main__":

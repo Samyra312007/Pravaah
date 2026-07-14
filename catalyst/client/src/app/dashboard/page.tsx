@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { FolderSearch, FileSearch, TrendingUp, AlertTriangle, Scale, Users, Gavel, Brain } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
 import { KpiCard, TrendChart, CategoryBreakdownChart, DistrictComparisonChart, RiskScoreMap, AnomalyCards, SocioEconomicChart } from "@/components/charts";
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const { scores, loading: scoresLoading } = useRiskScores();
   const { anomalies, loading: anomaliesLoading } = useAnomalies();
   const { data: socioEconomic, loading: socioLoading } = useSocioEconomic();
+  const [quarterlyView, setQuarterlyView] = useState(false);
 
   return (
     <RoleGuard roles={allRoles}>
@@ -96,13 +98,25 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-800">Monthly Crime Trends</h3>
-              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">2024-2026</span>
+              <h3 className="font-semibold text-gray-800">Crime Trends</h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setQuarterlyView(!quarterlyView)}
+                  className={`text-xs px-2 py-1 rounded border transition-colors ${
+                    quarterlyView
+                      ? "bg-ksp-blue text-white border-ksp-blue"
+                      : "text-gray-400 bg-gray-50 border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  {quarterlyView ? "Quarterly" : "Monthly"}
+                </button>
+                <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">2024-2026</span>
+              </div>
             </div>
             {trendsLoading ? (
               <div className="h-80 flex items-center justify-center text-gray-400 text-sm">Loading...</div>
             ) : (
-              <TrendChart data={trends} />
+              <TrendChart data={trends} showQuarterly={quarterlyView} />
             )}
           </div>
 
