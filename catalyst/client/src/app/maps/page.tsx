@@ -3,10 +3,7 @@
 import { useState, useCallback, useMemo } from "react";
 import maplibregl from "maplibre-gl";
 import { RoleGuard } from "@/components/layout/RoleGuard";
-import { CrimeMap } from "@/components/maps/CrimeMap";
-import { CrimeHeatmapLayer } from "@/components/maps/CrimeHeatmapLayer";
-import { StationMarkers } from "@/components/maps/StationMarkers";
-import { SpatiotemporalHeatmap } from "@/components/maps/SpatiotemporalHeatmap";
+import { CrimeMap, CrimeHeatmapLayer, StationMarkers, SpatiotemporalHeatmap, DistrictBoundaryLayer } from "@/components/maps";
 import { useHotspots } from "@/hooks/useMockAnalytics";
 import { generateMockDistrictDrillDown } from "@/lib/mock/mockData";
 import type { Role } from "@/types/common";
@@ -162,6 +159,12 @@ export default function MapsPage() {
             {/* Map Layers (rendered outside map div, add to map instance directly) */}
             {mapInstance && !loading && (
               <>
+                <DistrictBoundaryLayer
+                  map={mapInstance}
+                  visible={true}
+                  selectedDistrict={selectedDistrict}
+                  onDistrictClick={handleDistrictClick}
+                />
                 <CrimeHeatmapLayer map={mapInstance} hotspots={hotspots} visible={true} />
                 {drillDownData && (
                   <StationMarkers

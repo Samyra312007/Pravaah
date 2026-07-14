@@ -1,0 +1,32 @@
+{
+  "modelName": "KSP Case Anomaly Detector",
+  "description": "Detects anomalous crime cases based on MO, location, time, and demographic features using Isolation Forest",
+  "algorithm": "IsolationForest",
+  "targetColumn": null,
+  "anomalyType": "outlier_detection",
+  "featureColumns": [
+    "age_year",
+    "gender_id",
+    "hour_of_day",
+    "day_of_week",
+    "crime_head_id",
+    "district_id"
+  ],
+  "categoricalColumns": ["gender_id", "crime_head_id", "district_id"],
+  "trainingConfig": {
+    "contamination": 0.05,
+    "testSplit": 0.2,
+    "maxModelSize": "10MB",
+    "optimizationMetric": "F1"
+  },
+  "dataSource": {
+    "type": "csv",
+    "source": "Catalyst Data Store export via ZCQL",
+    "exportScript": "../export-training-data.js",
+    "schedule": "monthly"
+  },
+  "output": {
+    "modelFormat": "pkl",
+    "targetPath": "../appsail/ml-service/trained_models/anomaly_model.pkl"
+  }
+}
