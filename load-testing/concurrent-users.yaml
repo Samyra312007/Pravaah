@@ -1,0 +1,38 @@
+config:
+  target: "https://ksp-crime.karnataka.gov.in/api"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      rampTo: 100
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 100
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 200
+      name: "Peak load"
+  defaults:
+    headers:
+      Authorization: "Bearer {{ AUTH_TOKEN }}"
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Mixed user workflow"
+    flow:
+      - get:
+          url: "/cases?page=1&perPage=25"
+      - think: 1
+      - get:
+          url: "/analytics/dashboard"
+      - think: 0.5
+      - get:
+          url: "/analytics/trends?period=monthly"
+      - think: 1
+      - get:
+          url: "/maps/hotspots"
+      - think: 0.5
+      - get:
+          url: "/network/repeat-offenders"
+      - think: 2
+      - get:
+          url: "/ml/risk-score/1"
