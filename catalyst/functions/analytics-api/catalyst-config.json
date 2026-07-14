@@ -9,6 +9,17 @@
       { "path": "/analytics/hotspots", "method": "GET", "function": "hotspots" },
       { "path": "/analytics/district/{id}", "method": "GET", "function": "district-stats" },
       { "path": "/analytics/district-comparison", "method": "GET", "function": "district-comparison" }
-    ]
+    ],
+    "throttling": {
+      "enabled": true,
+      "rate": {
+        "window_ms": 60000,
+        "max_requests": 100
+      }
+    },
+    "authentication": {
+      "enabled": true,
+      "roles": ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR", "ANALYST"]
+    }
   }
 }

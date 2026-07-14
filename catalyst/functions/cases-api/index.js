@@ -56,9 +56,10 @@ async function handler(req, res) {
     const offset = (parseInt(page) - 1) * parseInt(perPage);
     baseQuery += ` LIMIT ${parseInt(perPage)} OFFSET ${offset}`;
 
+    const paramValues = Object.keys(params).length > 0 ? params : undefined;
     const [totalResult, cases] = await Promise.all([
-      query.execute(countQuery),
-      query.execute(baseQuery),
+      query.execute(countQuery, paramValues),
+      query.execute(baseQuery, paramValues),
     ]);
 
     res.status(200).json({

@@ -6,6 +6,17 @@
     "routes": [
       { "path": "/reports/generate", "method": "POST", "function": "index" },
       { "path": "/reports/{id}/download", "method": "GET", "function": "generate-pdf" }
-    ]
+    ],
+    "throttling": {
+      "enabled": true,
+      "rate": {
+        "window_ms": 60000,
+        "max_requests": 100
+      }
+    },
+    "authentication": {
+      "enabled": true,
+      "roles": ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR", "ANALYST"]
+    }
   }
 }

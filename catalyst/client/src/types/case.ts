@@ -53,6 +53,8 @@ export interface ActSectionAssociation {
   SectionID: string;
   ActOrderID?: number;
   SectionOrderID?: number;
+  ShortName?: string;
+  SectionDescription?: string;
 }
 
 export interface ArrestSurrender {

@@ -6,6 +6,13 @@
     "routes": [
       { "path": "/auth/login", "method": "POST", "function": "login" },
       { "path": "/auth/me", "method": "GET", "function": "me" }
-    ]
+    ],
+    "throttling": {
+      "enabled": true,
+      "rate": {
+        "window_ms": 60000,
+        "max_requests": 20
+      }
+    }
   }
 }

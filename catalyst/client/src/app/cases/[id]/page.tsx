@@ -145,7 +145,8 @@ export default function CaseDetailPage() {
   const { master, victims, accused, complainants, actSections, arrests, chargesheet, references } = caseDetail;
   const refs = references || {};
 
-  const statusColors: Record<string, string> = {
+  type BadgeVariant = "default" | "primary" | "success" | "warning" | "danger" | "info";
+  const statusColors: Record<string, BadgeVariant> = {
     "Under Investigation": "warning", "Chargesheet Filed": "info",
     "Trial in Progress": "primary", Convicted: "danger",
     Acquitted: "success", Closed: "default",
@@ -187,7 +188,7 @@ export default function CaseDetailPage() {
               <h2 className="text-xl font-semibold text-gray-900">
                 Case {master.CrimeNo || `#${master.CaseMasterID}`}
               </h2>
-              <Badge variant={(statusColors[refs.status?.CaseStatusName || ""] || "default") as any}>
+              <Badge variant={statusColors[refs.status?.CaseStatusName || ""] || "default"}>
                 {refs.status?.CaseStatusName || "—"}
               </Badge>
               <Badge variant={refs.gravity?.LookupValue === "Heinous" ? "danger" : "default"}>
@@ -406,10 +407,10 @@ export default function CaseDetailPage() {
                         <Scale className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
                         <div>
                           <span className="font-medium text-gray-800">
-                            {(as as any).ShortName || `Act ${as.ActID}`} § {as.SectionID}
+                            {as.ShortName || `Act ${as.ActID}`} § {as.SectionID}
                           </span>
-                          {(as as any).SectionDescription && (
-                            <p className="text-xs text-gray-400">{(as as any).SectionDescription}</p>
+                          {as.SectionDescription && (
+                            <p className="text-xs text-gray-400">{as.SectionDescription}</p>
                           )}
                         </div>
                       </div>

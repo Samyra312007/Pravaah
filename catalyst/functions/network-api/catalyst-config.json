@@ -7,6 +7,17 @@
       { "path": "/network/connections/{entityId}", "method": "GET", "function": "index" },
       { "path": "/network/repeat-offenders", "method": "GET", "function": "repeat-offenders" },
       { "path": "/network/associations", "method": "GET", "function": "associations" }
-    ]
+    ],
+    "throttling": {
+      "enabled": true,
+      "rate": {
+        "window_ms": 60000,
+        "max_requests": 100
+      }
+    },
+    "authentication": {
+      "enabled": true,
+      "roles": ["SCRB_ADMIN", "DISTRICT_SP", "STATION_SHO", "INVESTIGATOR", "ANALYST"]
+    }
   }
 }

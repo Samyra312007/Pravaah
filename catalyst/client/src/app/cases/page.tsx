@@ -50,13 +50,13 @@ export default function CasesPage() {
         ]);
 
         if (dRes.status === "fulfilled" && dRes.value.data) {
-          setDistricts(dRes.value.data.map((d: any) => ({ id: d.DistrictID, name: d.DistrictName })));
+          setDistricts(dRes.value.data.map((d: { DistrictID: number; DistrictName: string }) => ({ id: d.DistrictID, name: d.DistrictName })));
         }
         if (cRes.status === "fulfilled" && cRes.value.data) {
-          setCrimeHeads(cRes.value.data.map((c: any) => ({ id: c.CrimeHeadID, name: c.CrimeGroupName })));
+          setCrimeHeads(cRes.value.data.map((c: { CrimeHeadID: number; CrimeGroupName: string }) => ({ id: c.CrimeHeadID, name: c.CrimeGroupName })));
         }
         if (sRes.status === "fulfilled" && sRes.value.data) {
-          setStatuses(sRes.value.data.map((s: any) => ({ id: s.CaseStatusID, name: s.CaseStatusName })));
+          setStatuses(sRes.value.data.map((s: { CaseStatusID: number; CaseStatusName: string }) => ({ id: s.CaseStatusID, name: s.CaseStatusName })));
         }
       } catch {
         // If lookup APIs fail, use hardcoded fallbacks
