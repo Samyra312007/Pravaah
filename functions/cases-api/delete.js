@@ -5,6 +5,12 @@ async function handler(req, res) {
     const { id } = req.path_params;
     const app = catalyst.initialize(req);
     const table = app.datastore().getTable("CaseMaster");
+    const query = app.datastore().getTable("CaseMaster").getQuery();
+
+    const existing = await query.execute("SELECT CaseMasterID FROM CaseMaster WHERE CaseMasterID = :id", { id: parseInt(id) });
+    if (existing.length === 0) {
+      return res.status(404).json({ status: "error", error: { code: "NOT_FOUND", message: "Case not found" } });
+    }
 
     await table.updateRow({ CaseMasterID: parseInt(id), CaseStatusID: 6 });
     res.status(200).json({ status: "success", data: { CaseMasterID: parseInt(id), CaseStatusID: 6, message: "Case closed (soft delete)" } });

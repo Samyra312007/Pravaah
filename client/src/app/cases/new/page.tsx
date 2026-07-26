@@ -296,6 +296,7 @@ export default function NewCasePage() {
                       <option value="3">NDPS Act</option>
                       <option value="4">IT Act</option>
                       <option value="5">Arms Act</option>
+                      <option value="6">POCSO Act</option>
                     </select>
                     <input value={a.sectionId} onChange={(e) => { const u = [...actSections]; u[i].sectionId = e.target.value; setActSections(u); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm" placeholder="Section (e.g. 302, 376, 420)" />
                   </div>

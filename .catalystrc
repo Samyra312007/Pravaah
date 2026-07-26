@@ -1,0 +1,38 @@
+{
+  "defaults": {
+    "project": 1,
+    "env": 1
+  },
+  "actives": {
+    "project": 1,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "45555000000025001",
+      "name": "ksp-crime-intelligence",
+      "domain": {
+        "id": "50044002437",
+        "name": "ksp-crime-intelligence-60074731971.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "60074731971",
+          "name": "Development",
+          "type": 3,
+          "env_status": "Active",
+          "project_details": {
+            "project_name": "ksp-crime-intelligence",
+            "id": "45555000000025001",
+            "project_type": "Live"
+          },
+          "is_default": true,
+          "action_required": false
+        }
+      ]
+    }
+  ]
+}

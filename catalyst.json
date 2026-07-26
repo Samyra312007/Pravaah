@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "source": "functions",
+    "targets": [
+      "cases-api", "auth-api", "analytics-api", "network-api",
+      "lookups-api", "reports-api", "mail-api", "cron-reports",
+      "cron-trends", "event-anomaly", "circuits-api"
+    ]
+  },
+  "client": {
+    "source": "client"
+  }
+}

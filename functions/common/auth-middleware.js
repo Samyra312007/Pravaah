@@ -1,4 +1,28 @@
-const { verifyJWT } = require("../auth-api/login");
+const crypto = require("crypto");
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+function base64UrlDecode(str) {
+  return Buffer.from(str, "base64url").toString("utf-8");
+}
+
+function verifyJWT(token) {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const [headerEncoded, payloadEncoded, signature] = parts;
+    const expectedSig = crypto
+      .createHmac("sha256", JWT_SECRET)
+      .update(`${headerEncoded}.${payloadEncoded}`)
+      .digest("base64url");
+    if (signature !== expectedSig) return null;
+    const payload = JSON.parse(base64UrlDecode(payloadEncoded));
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
 
 const ROLE_HIERARCHY = {
   SCRB_ADMIN: 5,

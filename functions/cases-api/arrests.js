@@ -8,7 +8,7 @@ async function handler(req, res) {
     const query = app.datastore().getTable("ArrestSurrender").getQuery();
 
     if (req.method === "GET") {
-      const result = await query.execute(`SELECT * FROM ArrestSurrender WHERE CaseMasterID = ${id}`);
+      const result = await query.execute("SELECT * FROM ArrestSurrender WHERE CaseMasterID = :id", { id: parseInt(id) });
       return res.status(200).json({ status: "success", data: result });
     }
 

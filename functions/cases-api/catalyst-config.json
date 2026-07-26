@@ -21,7 +21,13 @@
       { "path": "/cases/{id}/chargesheet", "method": "GET", "function": "chargesheet" },
       { "path": "/cases/{id}/chargesheet", "method": "POST", "function": "chargesheet" },
       { "path": "/cases/{id}/arrests", "method": "GET", "function": "arrests" },
-      { "path": "/cases/{id}/arrests", "method": "POST", "function": "arrests" }
+      { "path": "/cases/{id}/arrests", "method": "POST", "function": "arrests" },
+      { "path": "/cases/{id}/victims/{vid}", "method": "PUT", "function": "victims" },
+      { "path": "/cases/{id}/victims/{vid}", "method": "DELETE", "function": "victims" },
+      { "path": "/cases/{id}/accused/{aid}", "method": "PUT", "function": "accused" },
+      { "path": "/cases/{id}/accused/{aid}", "method": "DELETE", "function": "accused" },
+      { "path": "/cases/{id}/complainants/{cid}", "method": "PUT", "function": "complainants" },
+      { "path": "/cases/{id}/complainants/{cid}", "method": "DELETE", "function": "complainants" }
     ],
     "throttling": {
       "enabled": true,

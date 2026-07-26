@@ -148,8 +148,38 @@ export default function CaseDetailPage() {
   if (loading) {
     return (
       <RoleGuard roles={caseRoles}>
-        <div className="flex items-center justify-center h-64">
-          <p className="text-gray-400 text-sm">Loading case details...</p>
+        <div className="space-y-6 animate-pulse">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 bg-gray-200 rounded-lg" />
+            <div className="space-y-2 flex-1">
+              <div className="h-6 w-48 bg-gray-200 rounded" />
+              <div className="h-4 w-32 bg-gray-200 rounded" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+                  <div className="h-5 w-32 bg-gray-200 rounded" />
+                  <div className="grid grid-cols-2 gap-3">
+                    {[1, 2, 3, 4].map((j) => (
+                      <div key={j} className="h-4 bg-gray-200 rounded" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-6">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
+                  <div className="h-5 w-24 bg-gray-200 rounded" />
+                  {[1, 2, 3].map((j) => (
+                    <div key={j} className="h-12 bg-gray-200 rounded" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </RoleGuard>
     );

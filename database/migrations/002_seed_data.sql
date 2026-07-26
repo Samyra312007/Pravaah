@@ -153,5 +153,34 @@ INSERT INTO Court (CourtID, CourtName, DistrictID, StateID, Active) VALUES
 (4, 'Belagavi District Court', 5, 1, TRUE),
 (5, 'Ballari Sessions Court', 6, 1, TRUE);
 
+-- Occupation Master
+INSERT INTO OccupationMaster (OccupationID, OccupationName) VALUES
+(1, 'Farmer'),
+(2, 'Teacher'),
+(3, 'Business'),
+(4, 'Private Employee'),
+(5, 'Government Employee'),
+(6, 'Daily Wage'),
+(7, 'Student'),
+(8, 'Unemployed');
+
+-- Religion Master
+INSERT INTO ReligionMaster (ReligionID, ReligionName) VALUES
+(1, 'Hindu'),
+(2, 'Muslim'),
+(3, 'Christian'),
+(4, 'Sikh'),
+(5, 'Jain'),
+(6, 'Buddhist'),
+(7, 'Other');
+
+-- Caste Master
+INSERT INTO CasteMaster (caste_master_id, caste_master_name) VALUES
+(1, 'General'),
+(2, 'OBC'),
+(3, 'SC'),
+(4, 'ST'),
+(5, 'Other');
+
 -- Phase 2: 200+ sample cases across 5 districts
 RUN SCRIPT '../seeds/seed_200_cases.sql';

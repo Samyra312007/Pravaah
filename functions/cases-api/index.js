@@ -6,7 +6,7 @@ async function handler(req, res) {
     const {
       page = 1, perPage = 50, sortBy = "CrimeRegisteredDate", sortOrder = "DESC",
       districtId, unitId, crimeHeadId, statusId, gravityId,
-      dateFrom, dateTo, searchQuery
+      dateFrom, dateTo, searchQuery, q
     } = req.query;
 
     const query = getQuery(req);
@@ -35,10 +35,11 @@ async function handler(req, res) {
     if (dateFrom) { conditions.push("cm.CrimeRegisteredDate >= :dateFrom"); params.dateFrom = dateFrom; }
     if (dateTo) { conditions.push("cm.CrimeRegisteredDate <= :dateTo"); params.dateTo = dateTo; }
 
-    if (searchQuery) {
+    const searchVal = searchQuery || q;
+    if (searchVal) {
       conditions.push("(cm.CrimeNo LIKE :search OR cm.CaseNo LIKE :search OR cm.BriefFacts LIKE :search2)");
-      params.search = `%${searchQuery}%`;
-      params.search2 = `%${searchQuery}%`;
+      params.search = `%${searchVal}%`;
+      params.search2 = `%${searchVal}%`;
     }
 
     let countQuery = `SELECT COUNT(*) as total FROM CaseMaster cm LEFT JOIN Unit u ON cm.UnitID = u.UnitID`;
